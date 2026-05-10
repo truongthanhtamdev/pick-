@@ -3,135 +3,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kế Hoạch Marketing – Global City Pickleball Academy</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<title>Master Plan – Global City Pickleball Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --lime:#c8f000; --lime2:rgba(200,240,0,0.08);
-  --dark:#080808; --ink:#111; --card:#141414;
-  --border:#1e1e1e; --border2:#2a2a2a;
-  --muted:#555; --muted2:#888; --text:#e5e5e5;
-  --accent:#ff4422; --gold:#f0b000; --blue:#4488ff; --green:#22dd88;
+:root{
+  --lime:#c8f000;--limd:rgba(200,240,0,0.08);
+  --dark:#070707;--ink:#0e0e0e;--card:#141414;--card2:#1a1a1a;
+  --b1:#1c1c1c;--b2:#262626;--b3:#333;
+  --mu:#555;--mu2:#888;--text:#e8e8e8;
+  --red:#ff4422;--gold:#f0b000;--blue:#4488ff;--green:#22dd88;--purple:#a855f7;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
-body{background:var(--dark);color:var(--text);font-family:'DM Sans',sans-serif;line-height:1.6;}
+body{background:var(--dark);color:var(--text);font-family:'DM Sans',sans-serif;line-height:1.6;font-size:15px;}
 
-.cover{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:64px 60px;position:relative;overflow:hidden;border-bottom:1px solid var(--border);}
-.cover-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 30%,rgba(200,240,0,0.06) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 20% 80%,rgba(255,68,34,0.04) 0%,transparent 50%),var(--dark);}
-.cover-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;opacity:0.4;}
-.cover-tag{display:inline-block;font-size:0.7rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--lime);border:1px solid rgba(200,240,0,0.3);padding:5px 14px;border-radius:4px;margin-bottom:24px;position:relative;}
-.cover h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,9vw,8rem);line-height:0.92;letter-spacing:2px;position:relative;max-width:900px;}
-.cover h1 em{color:var(--lime);font-style:normal;}
-.cover-sub{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.3rem;color:var(--muted2);margin-top:20px;position:relative;max-width:560px;line-height:1.5;}
-.cover-meta{display:flex;gap:40px;margin-top:48px;position:relative;}
-.cover-meta-item{border-left:2px solid var(--lime);padding-left:16px;}
-.cover-meta-val{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--lime);line-height:1;}
-.cover-meta-label{font-size:0.72rem;color:var(--muted);letter-spacing:1px;margin-top:2px;text-transform:uppercase;}
+/* ── COVER ── */
+.cover{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:60px 60px 56px;position:relative;overflow:hidden;}
+.cbg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 75% 25%,rgba(200,240,0,0.08),transparent 55%),radial-gradient(ellipse 40% 50% at 5% 85%,rgba(255,68,34,0.05),transparent 50%),var(--dark);}
+.cgr{position:absolute;inset:0;background-image:linear-gradient(var(--b1) 1px,transparent 1px),linear-gradient(90deg,var(--b1) 1px,transparent 1px);background-size:60px 60px;opacity:0.4;}
+.ctag{position:relative;display:inline-flex;align-items:center;gap:8px;font-size:0.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--lime);border:1px solid rgba(200,240,0,0.2);padding:5px 14px;border-radius:4px;margin-bottom:24px;}
+.c-h1{position:relative;font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,9vw,8.5rem);line-height:0.88;letter-spacing:2px;}
+.c-h1 em{color:var(--lime);font-style:normal;}
+.c-sub{position:relative;color:var(--mu2);font-size:0.88rem;margin-top:18px;max-width:560px;line-height:1.8;}
+.c-meta{position:relative;display:flex;gap:0;margin-top:44px;border:1px solid var(--b2);border-radius:14px;overflow:hidden;}
+.cmi{flex:1;padding:18px 20px;border-right:1px solid var(--b2);}
+.cmi:last-child{border-right:none;}
+.cmv{font-family:'Bebas Neue',sans-serif;font-size:2rem;line-height:1;}
+.cml{font-size:0.6rem;color:var(--mu);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
 
-.toc{position:sticky;top:0;z-index:100;background:rgba(8,8,8,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 60px;display:flex;overflow-x:auto;scrollbar-width:none;}
-.toc::-webkit-scrollbar{display:none;}
-.toc-item{padding:14px 18px;font-size:0.78rem;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.2s;}
-.toc-item:hover{color:var(--text);}
-.toc-item.active{color:var(--lime);border-bottom-color:var(--lime);}
+/* ── SIDEBAR NAV ── */
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:240px;flex-shrink:0;background:var(--ink);border-right:1px solid var(--b1);position:sticky;top:0;height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--b2) transparent;}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px;}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid var(--b1);}
+.sb-logo-t{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--lime);}
+.sb-logo-s{font-size:0.6rem;color:var(--mu);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
+.sb-section{padding:14px 16px 4px;font-size:0.58rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mu);}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px;margin:1px 8px;border-radius:8px;font-size:0.78rem;font-weight:500;color:var(--mu2);cursor:pointer;transition:all 0.15s;}
+.sb-item:hover{background:var(--card2);color:var(--text);}
+.sb-item.active{background:var(--limd);color:var(--lime);font-weight:700;}
+.sb-icon{font-size:0.9rem;width:18px;text-align:center;flex-shrink:0;}
+.sb-bottom{margin-top:auto;padding:14px 16px;border-top:1px solid var(--b1);font-size:0.7rem;color:var(--mu);line-height:1.7;}
 
-.section{max-width:1000px;margin:0 auto;padding:72px 60px;border-bottom:1px solid var(--border);}
-.section:last-child{border-bottom:none;}
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;}
+.sec{max-width:960px;margin:0 auto;padding:64px 52px;border-bottom:1px solid var(--b1);}
+.sec:last-child{border-bottom:none;}
+.ey{font-size:0.6rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--lime);margin-bottom:9px;}
+.st{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,3.5vw,2.8rem);letter-spacing:1px;line-height:1;margin-bottom:7px;}
+.st em{color:var(--lime);font-style:normal;}
+.si{color:var(--mu2);font-size:0.85rem;max-width:520px;line-height:1.8;margin-bottom:32px;}
 
-.eyebrow{font-size:0.68rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--lime);margin-bottom:10px;}
-.sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,4vw,3.2rem);letter-spacing:1px;line-height:1;margin-bottom:8px;}
-.sec-title em{color:var(--lime);font-style:normal;}
-.sec-intro{color:var(--muted2);font-size:0.95rem;max-width:560px;line-height:1.7;margin-bottom:40px;}
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
 
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
-
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;transition:border-color 0.2s;}
-.card:hover{border-color:var(--border2);}
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--b1);border-radius:12px;padding:20px;transition:border-color 0.2s;}
+.card:hover{border-color:var(--b2);}
 .al{border-left:3px solid var(--lime);}
-.ar{border-left:3px solid var(--accent);}
+.ar{border-left:3px solid var(--red);}
 .ag{border-left:3px solid var(--gold);}
 .ab{border-left:3px solid var(--blue);}
 .agr{border-left:3px solid var(--green);}
+.apr{border-left:3px solid var(--purple);}
+.cl{font-size:0.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mu);margin-bottom:5px;}
+.ct{font-weight:700;font-size:0.93rem;margin-bottom:5px;}
+.cb{font-size:0.78rem;color:var(--mu2);line-height:1.6;}
+.cn{font-family:'Bebas Neue',sans-serif;font-size:2rem;line-height:1;margin-bottom:3px;}
 
-.c-icon{font-size:1.6rem;margin-bottom:12px;}
-.c-lbl{font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
-.c-title{font-weight:700;font-size:1rem;margin-bottom:6px;}
-.c-body{font-size:0.82rem;color:var(--muted2);line-height:1.6;}
-.c-num{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--lime);line-height:1;margin-bottom:4px;}
+/* ── HIGHLIGHT ── */
+.hl{background:linear-gradient(135deg,rgba(200,240,0,0.06),rgba(200,240,0,0.02));border:1px solid rgba(200,240,0,0.16);border-radius:12px;padding:24px 28px;margin:22px 0;}
+.hlt{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;color:var(--lime);margin-bottom:10px;}
+.hl-red{background:rgba(255,68,34,0.05);border-color:rgba(255,68,34,0.15);}
+.hl-red .hlt{color:var(--red);}
 
-.hl{background:linear-gradient(135deg,rgba(200,240,0,0.06),rgba(200,240,0,0.02));border:1px solid rgba(200,240,0,0.2);border-radius:14px;padding:28px 32px;margin:28px 0;}
-.hl-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:1px;color:var(--lime);margin-bottom:10px;}
+/* ── ROW ── */
+.row{display:flex;gap:9px;margin-bottom:9px;align-items:flex-start;}
+.ri{font-size:0.95rem;flex-shrink:0;margin-top:2px;}
+.rt{font-size:0.82rem;line-height:1.6;}
+.rt strong,.rt b{color:var(--lime);}
+.rt em{color:var(--text);font-style:normal;font-weight:600;}
 
-.row{display:flex;gap:12px;margin-bottom:10px;align-items:flex-start;}
-.ri{font-size:1.1rem;flex-shrink:0;margin-top:2px;}
-.rt{font-size:0.88rem;line-height:1.6;}
-.rt strong{color:var(--lime);}
+/* ── TABLE BASE ── */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{text-align:left;padding:9px 13px;font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mu);border-bottom:1px solid var(--b2);}
+.tbl td{padding:10px 13px;font-size:0.8rem;border-bottom:1px solid var(--b1);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(255,255,255,0.012);}
+.tbl-tot td{font-weight:700;border-top:2px solid var(--b2);border-bottom:none!important;}
+.pn{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;}
 
+/* ── SCHEDULE ── */
+.sched th{background:var(--card2);text-align:center;padding:10px 12px;}
+.sched td{background:var(--card);border:1px solid var(--b1);text-align:center;padding:9px 12px;}
+.sched td.tc{text-align:left;padding-left:14px;color:var(--mu2);font-weight:700;font-size:0.72rem;}
+.sl{display:inline-block;border-radius:6px;padding:4px 9px;font-size:0.7rem;font-weight:700;line-height:1.3;}
+.slg{background:rgba(34,221,136,0.1);color:var(--green);border:1px solid rgba(34,221,136,0.18);}
+.slo{background:rgba(240,176,0,0.1);color:var(--gold);border:1px solid rgba(240,176,0,0.18);}
+.slr{background:rgba(255,68,34,0.1);color:var(--red);border:1px solid rgba(255,68,34,0.18);}
+.slb{background:rgba(68,136,255,0.1);color:var(--blue);border:1px solid rgba(68,136,255,0.18);}
+.slp{background:rgba(168,85,247,0.1);color:var(--purple);border:1px solid rgba(168,85,247,0.18);}
+
+/* ── TIMELINE ── */
 .tl{display:flex;flex-direction:column;}
-.tl-item{display:grid;grid-template-columns:120px 1fr;gap:24px;padding:28px 0;border-bottom:1px solid var(--border);}
-.tl-item:last-child{border-bottom:none;}
-.tl-wk{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;color:var(--lime);padding-top:4px;}
-.tl-wk-s{font-size:0.7rem;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400;}
-.tl-t{font-weight:700;font-size:1rem;margin-bottom:8px;}
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
-.tag{font-size:0.68rem;font-weight:700;padding:3px 10px;border-radius:4px;letter-spacing:0.5px;text-transform:uppercase;}
-.tl{background:rgba(200,240,0,0.12);color:var(--lime);border:1px solid rgba(200,240,0,0.2);}
-.tr{background:rgba(255,68,34,0.1);color:var(--accent);border:1px solid rgba(255,68,34,0.2);}
-.tg{background:rgba(240,176,0,0.1);color:var(--gold);border:1px solid rgba(240,176,0,0.2);}
-.tb{background:rgba(68,136,255,0.1);color:var(--blue);border:1px solid rgba(68,136,255,0.2);}
-.tgr{background:rgba(34,221,136,0.1);color:var(--green);border:1px solid rgba(34,221,136,0.2);}
-.li{list-style:none;display:flex;flex-direction:column;gap:5px;}
-.li li{font-size:0.83rem;color:var(--muted2);display:flex;align-items:flex-start;gap:8px;}
-.li li::before{content:'→';color:var(--lime);flex-shrink:0;margin-top:1px;}
+.tli{display:grid;grid-template-columns:100px 1fr;gap:18px;padding:22px 0;border-bottom:1px solid var(--b1);}
+.tli:last-child{border-bottom:none;}
+.tlw{font-family:'Bebas Neue',sans-serif;font-size:0.95rem;letter-spacing:1px;color:var(--lime);line-height:1.2;padding-top:2px;}
+.tlws{font-size:0.65rem;color:var(--mu);font-family:'DM Sans',sans-serif;margin-top:3px;}
+.tlt{font-weight:700;font-size:0.88rem;margin-bottom:7px;}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.tag{font-size:0.62rem;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:0.5px;text-transform:uppercase;}
+.tl2{background:rgba(200,240,0,0.1);color:var(--lime);border:1px solid rgba(200,240,0,0.16);}
+.tr2{background:rgba(255,68,34,0.1);color:var(--red);border:1px solid rgba(255,68,34,0.16);}
+.tg2{background:rgba(240,176,0,0.1);color:var(--gold);border:1px solid rgba(240,176,0,0.16);}
+.tb2{background:rgba(68,136,255,0.1);color:var(--blue);border:1px solid rgba(68,136,255,0.16);}
+.tgr2{background:rgba(34,221,136,0.1);color:var(--green);border:1px solid rgba(34,221,136,0.16);}
+.tp2{background:rgba(168,85,247,0.1);color:var(--purple);border:1px solid rgba(168,85,247,0.16);}
+.li{list-style:none;display:flex;flex-direction:column;gap:4px;}
+.li li{font-size:0.78rem;color:var(--mu2);display:flex;align-items:flex-start;gap:6px;}
+.li li::before{content:'→';color:var(--lime);flex-shrink:0;margin-top:2px;}
 
-.cx{background:var(--ink);border:1px solid var(--border2);border-radius:12px;padding:20px 22px;margin-bottom:12px;}
-.cx-type{font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
-.cx-hook{font-weight:700;font-size:0.95rem;margin-bottom:6px;color:var(--text);}
-.cx-body{font-size:0.8rem;color:var(--muted2);line-height:1.6;}
+/* ── FUNNEL ── */
+.funnel-step{position:relative;padding:14px 18px 14px 46px;border-left:2px solid var(--b2);margin-left:14px;}
+.funnel-step:last-child{border-left-color:transparent;}
+.fd{position:absolute;left:-8px;top:18px;width:14px;height:14px;border-radius:50%;background:var(--lime);border:2px solid var(--dark);}
+.fn{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--lime);line-height:1;margin-bottom:1px;}
+.fl{font-weight:700;font-size:0.84rem;margin-bottom:2px;}
+.fs{font-size:0.75rem;color:var(--mu2);}
+.fa{font-size:0.68rem;color:var(--mu);margin-top:5px;}
 
-.koc-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;}
-.koc-tier{font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
-.koc-name{font-weight:700;font-size:1rem;margin-bottom:4px;}
-.koc-f{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--lime);line-height:1;margin-bottom:2px;}
-.koc-fl{font-size:0.7rem;color:var(--muted);margin-bottom:12px;}
-.koc-r{display:flex;justify-content:space-between;font-size:0.78rem;padding:5px 0;border-bottom:1px solid var(--border);}
+/* ── KOC CARD ── */
+.koc-card{background:var(--card);border:1px solid var(--b1);border-radius:12px;padding:18px;}
+.koc-f{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--lime);line-height:1;margin-bottom:1px;}
+.koc-fl{font-size:0.65rem;color:var(--mu);margin-bottom:9px;}
+.koc-r{display:flex;justify-content:space-between;font-size:0.74rem;padding:4px 0;border-bottom:1px solid var(--b1);}
 .koc-r:last-child{border-bottom:none;}
-.koc-k{color:var(--muted);}
-.koc-v{font-weight:600;}
 
-.bt{width:100%;border-collapse:collapse;}
-.bt th{text-align:left;padding:10px 14px;font-size:0.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border2);}
-.bt td{padding:12px 14px;font-size:0.85rem;border-bottom:1px solid var(--border);vertical-align:top;}
-.bt tr:hover td{background:rgba(255,255,255,0.02);}
-.bt-tot td{font-weight:700;border-top:2px solid var(--border2);border-bottom:none;}
-.bamt{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--lime);}
-.bamt-tot{font-size:1.4rem;color:var(--accent);}
+/* ── CX ── */
+.cx{background:var(--ink);border:1px solid var(--b2);border-radius:10px;padding:16px 18px;margin-bottom:9px;}
+.cxt{font-size:0.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mu);margin-bottom:5px;}
+.cxh{font-weight:700;font-size:0.88rem;margin-bottom:4px;}
+.cxb{font-size:0.76rem;color:var(--mu2);line-height:1.6;}
 
-.sched-tbl{width:100%;border-collapse:collapse;}
-.sched-tbl th{background:#1c1c1c;padding:12px 16px;font-size:0.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);text-align:center;}
-.sched-tbl td{background:var(--card);padding:12px 16px;border:1px solid var(--border);text-align:center;font-size:0.82rem;}
-.sched-tbl td.tc{color:var(--muted2);font-weight:700;font-size:0.78rem;}
-.sl{border-radius:8px;padding:6px 10px;font-size:0.75rem;font-weight:700;display:inline-block;}
-.sl-g{background:rgba(34,221,136,0.12);color:var(--green);border:1px solid rgba(34,221,136,0.25);}
-.sl-o{background:rgba(240,176,0,0.12);color:var(--gold);border:1px solid rgba(240,176,0,0.25);}
-.sl-r{background:rgba(255,68,34,0.12);color:var(--accent);border:1px solid rgba(255,68,34,0.25);}
-.sl-b{background:rgba(68,136,255,0.12);color:var(--blue);border:1px solid rgba(68,136,255,0.25);}
+/* ── REV ROW ── */
+.rev-r{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;border-bottom:1px solid var(--b1);}
+.rev-r:last-child{border-bottom:none;}
+.rev-rl{font-size:0.8rem;color:var(--mu2);}
+.rev-rr{font-weight:700;font-size:0.85rem;}
 
-.rev-tbl{width:100%;border-collapse:collapse;margin-top:16px;}
-.rev-tbl th{text-align:left;padding:8px 12px;font-size:0.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border2);}
-.rev-tbl td{padding:10px 12px;font-size:0.83rem;border-bottom:1px solid var(--border);}
-.rev-tbl tr:last-child td{background:rgba(200,240,0,0.04);font-weight:700;border-top:2px solid rgba(200,240,0,0.2);border-bottom:none;}
-.rh{color:var(--lime);font-family:'Bebas Neue',sans-serif;font-size:1.1rem;}
+/* ── PROGRESS BAR ── */
+.pbar{display:flex;align-items:center;gap:12px;margin-bottom:9px;}
+.pbar-l{width:170px;flex-shrink:0;}
+.pbar-lv{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;line-height:1;}
+.pbar-ll{font-size:0.6rem;color:var(--mu);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.pbar-track{flex:1;height:7px;background:var(--b2);border-radius:50px;overflow:hidden;}
+.pbar-fill{height:100%;border-radius:50px;}
+.pbar-pct{font-size:0.72rem;color:var(--mu2);width:34px;text-align:right;}
 
-.footer{padding:48px 60px;text-align:center;color:var(--muted);font-size:0.78rem;border-top:1px solid var(--border);}
+/* ── MEMBER BUILDUP ── */
+.mb-row{display:flex;gap:0;border:1px solid var(--b1);border-radius:10px;overflow:hidden;margin-bottom:8px;}
+.mb-item{flex:1;padding:14px 16px;border-right:1px solid var(--b1);text-align:center;}
+.mb-item:last-child{border-right:none;}
+.mb-v{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;line-height:1;}
+.mb-l{font-size:0.62rem;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
 
-@media(max-width:768px){
-  .cover,.section{padding:48px 24px;}
-  .toc{padding:0 16px;}
+/* ── FOOTER ── */
+.footer{padding:44px 52px;text-align:center;color:var(--mu);font-size:0.74rem;border-top:1px solid var(--b1);}
+
+@media(max-width:900px){
+  .layout{flex-direction:column;}
+  .sidebar{width:100%;height:auto;position:relative;}
+  .sec{padding:44px 20px;}
   .g2,.g3,.g4{grid-template-columns:1fr;}
-  .tl-item{grid-template-columns:1fr;}
+  .c-meta,.cmeta{flex-direction:column;}
+  .tli{grid-template-columns:1fr;}
+  .cover{padding:44px 20px;}
 }
 </style>
 </head>
@@ -139,681 +188,623 @@ body{background:var(--dark);color:var(--text);font-family:'DM Sans',sans-serif;l
 
 <!-- COVER -->
 <div class="cover">
-  <div class="cover-bg"></div><div class="cover-grid"></div>
-  <div class="cover-tag">Tài liệu nội bộ · 2025</div>
-  <h1>KẾ HOẠCH<br><em>MARKETING</em><br>90 NGÀY</h1>
-  <div class="cover-sub">Academy Pickleball — Dạy học là core, Member là phụ · Global City, Q9 TP.HCM</div>
-  <div class="cover-meta">
-    <div class="cover-meta-item"><div class="cover-meta-val">3</div><div class="cover-meta-label">Sân · 3 lớp/tối</div></div>
-    <div class="cover-meta-item"><div class="cover-meta-val">37TR+</div><div class="cover-meta-label">Tiềm năng/tháng</div></div>
-    <div class="cover-meta-item"><div class="cover-meta-val">15TR</div><div class="cover-meta-label">Ngân sách cố định/tháng</div></div>
-    <div class="cover-meta-item"><div class="cover-meta-val">90</div><div class="cover-meta-label">Ngày thực thi</div></div>
+  <div class="cbg"></div><div class="cgr"></div>
+  <div class="ctag">🏓 Tài liệu nội bộ · Global City Pickleball · 2025</div>
+  <div class="c-h1">MASTER<br><em>PLAN</em><br>200TR</div>
+  <div class="c-sub">Bộ khung vận hành hoàn chỉnh: Academy Model · 3 Sân · 2–4 HLV · Ads 20TR · Member & Social · Mục tiêu 200TR/tháng</div>
+  <div class="c-meta">
+    <div class="cmi"><div class="cmv" style="color:var(--lime)">200TR</div><div class="cml">Mục tiêu/tháng</div></div>
+    <div class="cmi"><div class="cmv" style="color:var(--gold)">140TR</div><div class="cml">Khóa học 70%</div></div>
+    <div class="cmi"><div class="cmv" style="color:var(--blue)">60TR</div><div class="cml">Member 30%</div></div>
+    <div class="cmi"><div class="cmv" style="color:var(--red)">20TR</div><div class="cml">Ads/tháng</div></div>
+    <div class="cmi"><div class="cmv" style="color:var(--green)">3</div><div class="cml">Sân · 2–4 HLV</div></div>
+    <div class="cmi"><div class="cmv" style="color:var(--purple)">127TR</div><div class="cml">Lãi thực khi đạt</div></div>
   </div>
 </div>
 
-<!-- TOC -->
-<nav class="toc">
-  <div class="toc-item active" onclick="goTo('s1')">01 Academy Model</div>
-  <div class="toc-item" onclick="goTo('s2')">02 Khách Hàng</div>
-  <div class="toc-item" onclick="goTo('s3')">03 Lịch Học & Doanh Thu</div>
-  <div class="toc-item" onclick="goTo('s4')">04 Tuyển HLV</div>
-  <div class="toc-item" onclick="goTo('s5')">05 Member (Phụ)</div>
-  <div class="toc-item" onclick="goTo('s6')">06 Facebook Ads</div>
-  <div class="toc-item" onclick="goTo('s7')">07 KOC Mini</div>
-  <div class="toc-item" onclick="goTo('s8')">08 Lịch Content</div>
-  <div class="toc-item" onclick="goTo('s9')">09 Timeline 90 Ngày</div>
-  <div class="toc-item" onclick="goTo('s10')">10 Ngân Sách & KPI</div>
-</nav>
+<!-- MAIN LAYOUT -->
+<div class="layout">
 
-<!-- S1 -->
-<div class="section" id="s1">
-  <div class="eyebrow">01 · Định hướng</div>
-  <div class="sec-title">ACADEMY MODEL<br><em>LÀ CỐT LÕI</em></div>
-  <div class="sec-intro">Không phải sân cho thuê — mà là trung tâm đào tạo Pickleball. Khóa học là doanh thu chính, member là upsell tự nhiên sau khi học xong.</div>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-t">GLOBAL CITY PB</div>
+    <div class="sb-logo-s">Master Plan 2025</div>
+  </div>
 
-  <div class="g3" style="margin-bottom:28px">
+  <div class="sb-section">Chiến lược</div>
+  <div class="sb-item active" onclick="go('s1')"><span class="sb-icon">🎯</span>01 · Định hướng Academy</div>
+  <div class="sb-item" onclick="go('s2')"><span class="sb-icon">📊</span>02 · Tính ngược 200TR</div>
+  <div class="sb-item" onclick="go('s3')"><span class="sb-icon">👥</span>03 · Khách hàng mục tiêu</div>
+
+  <div class="sb-section">Vận hành</div>
+  <div class="sb-item" onclick="go('s4')"><span class="sb-icon">📅</span>04 · Lịch học 3 sân</div>
+  <div class="sb-item" onclick="go('s5')"><span class="sb-icon">🏋️</span>05 · Tuyển & Chính sách HLV</div>
+  <div class="sb-item" onclick="go('s6')"><span class="sb-icon">🎫</span>06 · Chiến lược Member</div>
+  <div class="sb-item" onclick="go('s7')"><span class="sb-icon">🏆</span>07 · Đánh Social</div>
+
+  <div class="sb-section">Marketing</div>
+  <div class="sb-item" onclick="go('s8')"><span class="sb-icon">📱</span>08 · Facebook Ads 20TR</div>
+  <div class="sb-item" onclick="go('s9')"><span class="sb-icon">🌟</span>09 · KOC Mini</div>
+  <div class="sb-item" onclick="go('s10')"><span class="sb-icon">🎬</span>10 · Lịch Content</div>
+
+  <div class="sb-section">Tài chính</div>
+  <div class="sb-item" onclick="go('s11')"><span class="sb-icon">💰</span>11 · P&L Thực tế</div>
+
+  <div class="sb-section">Thực thi</div>
+  <div class="sb-item" onclick="go('s12')"><span class="sb-icon">🗓️</span>12 · Timeline 90 Ngày</div>
+  <div class="sb-item" onclick="go('s13')"><span class="sb-icon">📈</span>13 · KPI & Funnel</div>
+
+  <div class="sb-bottom">
+    📍 625A Đỗ Xuân Hợp<br>Phước Long, Q9, TP.HCM<br>📞 0934 492 856
+  </div>
+</aside>
+
+<!-- CONTENT -->
+<div class="content" id="mainContent">
+
+<!-- S1: ĐỊNH HƯỚNG -->
+<div class="sec" id="s1">
+  <div class="ey">01 · Định hướng cốt lõi</div>
+  <div class="st">ACADEMY MODEL —<br><em>DẠY LÀ CORE</em></div>
+  <div class="si">Không phải sân cho thuê — là trung tâm đào tạo Pickleball. Học phí là doanh thu chính, member là upsell tự nhiên sau khi học xong.</div>
+
+  <div class="g3" style="margin-bottom:20px">
     <div class="card al">
-      <div class="c-icon">🎓</div>
-      <div class="c-lbl">Core revenue</div>
-      <div class="c-title">Học phí khóa học</div>
-      <div class="c-body">3 cấp độ · 2.5tr–5.5tr/khóa · Private 500k/buổi. Học xong = tự chơi được → mua member để duy trì.</div>
+      <div class="cl">Core · 70% doanh thu</div>
+      <div class="ct">🎓 Học phí khóa học</div>
+      <div class="cb">3 cấp độ Starter→Advanced + Private 1-1. Học xong → tự chơi → mua member để duy trì.</div>
     </div>
     <div class="card ag">
-      <div class="c-icon">🎫</div>
-      <div class="c-lbl">Phụ revenue</div>
-      <div class="c-title">Member chơi tự do</div>
-      <div class="c-body">Học viên hoàn thành khóa → mua member để tiếp tục chơi sáng/cuối tuần. Chuyển đổi tự nhiên, không cần push mạnh.</div>
+      <div class="cl">Phụ · 30% doanh thu</div>
+      <div class="ct">🎫 Member chơi tự do</div>
+      <div class="cb">Upsell tự nhiên từ học viên cũ + dân chơi thể thao social. Không cần ads riêng.</div>
     </div>
     <div class="card ab">
-      <div class="c-icon">🔄</div>
-      <div class="c-lbl">Vòng lặp tăng trưởng</div>
-      <div class="c-title">Học → Chơi → Giới thiệu</div>
-      <div class="c-body">Học viên chơi tốt → rủ bạn bè → bạn đăng ký học → vòng lặp organic. Chi phí marketing giảm dần theo tháng.</div>
+      <div class="cl">Đòn bẩy tăng trưởng</div>
+      <div class="ct">🔄 Học → Chơi → Giới thiệu</div>
+      <div class="cb">Học viên giỏi → rủ bạn → bạn học → vòng lặp organic. Chi phí marketing giảm dần.</div>
     </div>
   </div>
 
   <div class="hl">
-    <div class="hl-title">⚡ Tại sao Academy model tốt hơn thuần cho thuê sân?</div>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
-      <div class="row"><div class="ri">💰</div><div class="rt">Học phí cao hơn nhiều: 1 lớp 8 người Starter = <strong>20tr</strong> vs cho thuê sân 8 buổi = chỉ <strong>~5tr</strong></div></div>
-      <div class="row"><div class="ri">📅</div><div class="rt">Doanh thu <strong>dự đoán được</strong> — lớp đã khai giảng, thu tiền trước. Không phụ thuộc khách vãng lai</div></div>
-      <div class="row"><div class="ri">🏆</div><div class="rt">Xây dựng <strong>thương hiệu chuyên môn</strong> — "Sân dạy Pickleball ở Q9" dễ nhớ, dễ giới thiệu hơn sân cho thuê thông thường</div></div>
-      <div class="row"><div class="ri">🌙</div><div class="rt">Tối 18–21h là <strong>giờ vàng dạy học</strong> — ít ai thuê sân tự chơi lúc này, nhưng dân văn phòng rảnh nhất để học</div></div>
-    </div>
+    <div class="hlt">⚡ Tại sao Academy tốt hơn cho thuê sân?</div>
+    <div class="row"><div class="ri">💰</div><div class="rt">1 lớp Starter 8 người = <strong>20TR</strong> vs cho thuê sân 8 buổi = chỉ <strong style="color:var(--mu2)">~5TR</strong></div></div>
+    <div class="row"><div class="ri">📅</div><div class="rt">Doanh thu <strong>dự đoán được</strong> — thu tiền trước khi khai giảng. Không phụ thuộc khách vãng lai.</div></div>
+    <div class="row"><div class="ri">🌙</div><div class="rt">Tối 18–22h là <strong>giờ vàng dạy học</strong> — dân văn phòng rảnh nhất, ít ai thuê sân tự chơi lúc này.</div></div>
+    <div class="row"><div class="ri">🏆</div><div class="rt"><strong>"Academy Pickleball Q9"</strong> — định vị thương hiệu rõ ràng, dễ nhớ, dễ giới thiệu hơn sân cho thuê thông thường.</div></div>
   </div>
 </div>
 
-<!-- S2 -->
-<div class="section" id="s2">
-  <div class="eyebrow">02 · Khách hàng mục tiêu</div>
-  <div class="sec-title">2 NHÓM<br><em>HỌC VIÊN</em></div>
-  <div class="sec-intro">Cả 3 cấp độ — mới hoàn toàn, biết sơ, muốn lên trình. Mỗi nhóm tuổi có thông điệp và kênh tiếp cận riêng.</div>
+<!-- S2: TÍNH NGƯỢC -->
+<div class="sec" id="s2">
+  <div class="ey">02 · Tính ngược từ mục tiêu</div>
+  <div class="st">200TR/THÁNG —<br><em>CẦN NHỮNG GÌ?</em></div>
+  <div class="si">Tính ngược từ 200TR xuống từng con số cụ thể: bao nhiêu lớp, bao nhiêu học viên, bao nhiêu member.</div>
+
+  <div class="g2" style="margin-bottom:16px">
+    <div style="background:var(--card);border:1px solid var(--b1);border-radius:12px;overflow:hidden">
+      <div style="padding:12px 16px;background:var(--card2);border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mu)">Khóa học · 70%</div></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--lime)">140TR</div>
+      </div>
+      <div class="rev-r"><span class="rev-rl">🌱 Starter · 3 lớp · 24 người × 2.5TR</span><span class="rev-rr" style="color:var(--green)">60TR</span></div>
+      <div class="rev-r"><span class="rev-rl">⚡ Intermediate · 2 lớp · 16 người × 3.8TR</span><span class="rev-rr" style="color:var(--gold)">60.8TR</span></div>
+      <div class="rev-r"><span class="rev-rl">🔥 Advanced · 1 lớp · 6 người × 5.5TR</span><span class="rev-rr" style="color:var(--red)">33TR</span></div>
+      <div class="rev-r"><span class="rev-rl">👑 Private · 20 buổi × 500k</span><span class="rev-rr" style="color:var(--purple)">10TR</span></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--b1);border-radius:12px;overflow:hidden">
+      <div style="padding:12px 16px;background:var(--card2);border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mu)">Member · 30%</div></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--lime)">60TR</div>
+      </div>
+      <div class="rev-r"><span class="rev-rl">Gói 6 tháng · 299k/th · ~80 người</span><span class="rev-rr" style="color:var(--lime)">23.9TR</span></div>
+      <div class="rev-r"><span class="rev-rl">Gói 3 tháng · 399k/th · ~60 người</span><span class="rev-rr" style="color:var(--lime)">23.9TR</span></div>
+      <div class="rev-r"><span class="rev-rl">Gói 1 tháng · 499k/th · ~25 người</span><span class="rev-rr" style="color:var(--lime)">12.5TR</span></div>
+      <div class="rev-r" style="border-top:1px solid var(--b2)"><span class="rev-rl" style="font-weight:700">Tổng member cần</span><span class="rev-rr" style="color:var(--lime);font-family:'Bebas Neue',sans-serif;font-size:1.1rem">~165 người</span></div>
+    </div>
+  </div>
+
+  <div class="g4" style="margin-bottom:20px">
+    <div style="background:var(--card2);border-radius:10px;padding:14px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--green);line-height:1">46</div><div style="font-size:0.6rem;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-top:3px">Học viên mới/tháng</div></div>
+    <div style="background:var(--card2);border-radius:10px;padding:14px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--gold);line-height:1">6</div><div style="font-size:0.6rem;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-top:3px">Lớp đang chạy</div></div>
+    <div style="background:var(--card2);border-radius:10px;padding:14px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--blue);line-height:1">165</div><div style="font-size:0.6rem;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-top:3px">Member active</div></div>
+    <div style="background:var(--card2);border-radius:10px;padding:14px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--lime);line-height:1">435k</div><div style="font-size:0.6rem;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-top:3px">Cost/học viên</div></div>
+  </div>
+
+  <div class="hl hl-red">
+    <div class="hlt">⚠️ Thực tế quan trọng</div>
+    <div class="row"><div class="ri">•</div><div class="rt"><em>165 member</em> không có ngay — tích lũy 4–5 tháng từ học viên cũ + social</div></div>
+    <div class="row"><div class="ri">•</div><div class="rt"><em>200TR là mục tiêu tháng 4–5</em>, không phải tháng 1. Tháng 1 thực tế ~30TR.</div></div>
+    <div class="row"><div class="ri">•</div><div class="rt">Tháng 1 thường là <em>kịch bản xấu</em> — ads chưa tối ưu, creative chưa tìm winner. Kỳ vọng 7–12 học viên.</div></div>
+  </div>
+
+  <!-- 3 scenarios -->
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;margin-bottom:12px;margin-top:4px">3 KỊCH BẢN <em style="color:var(--lime)">ADS 20TR</em></div>
+  <table class="tbl">
+    <thead><tr><th>Chỉ số</th><th style="color:var(--green)">🟢 Tích cực</th><th style="color:var(--gold)">🟡 Trung bình</th><th style="color:var(--red)">🔴 Xấu</th></tr></thead>
+    <tbody>
+      <tr><td><b>Học viên từ 20TR ads</b></td><td style="color:var(--green);font-weight:700">46 người</td><td style="color:var(--gold);font-weight:700">28 người</td><td style="color:var(--red);font-weight:700">14 người</td></tr>
+      <tr><td><b>Cost/student</b></td><td style="color:var(--green);font-weight:700">435k</td><td style="color:var(--gold);font-weight:700">714k</td><td style="color:var(--red);font-weight:700">1.43TR</td></tr>
+      <tr><td><b>Doanh thu học phí</b></td><td style="color:var(--green);font-weight:700">~140TR</td><td style="color:var(--gold);font-weight:700">~85TR</td><td style="color:var(--red);font-weight:700">~42TR</td></tr>
+      <tr class="tbl-tot"><td><b>ROAS</b></td><td><span class="pn" style="color:var(--green)">7x</span></td><td><span class="pn" style="color:var(--gold)">4.3x</span></td><td><span class="pn" style="color:var(--red)">2.1x</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- S3: KHÁCH HÀNG -->
+<div class="sec" id="s3">
+  <div class="ey">03 · Khách hàng mục tiêu</div>
+  <div class="st">2 NHÓM —<br><em>2 CÁCH TIẾP CẬN</em></div>
+  <div class="si">Mix cả hai nhóm tuổi — thông điệp và kênh tiếp cận khác nhau hoàn toàn.</div>
 
   <div class="g2">
     <div class="card ab">
-      <div class="c-lbl">Nhóm A · Học viên chính</div>
-      <div class="c-title" style="font-size:1.05rem;margin-bottom:10px">🏢 Dân văn phòng & gia đình · 30–50 tuổi</div>
-      <div class="c-body" style="margin-bottom:12px">Thu nhập ổn, tìm sport xã giao, hay đi nhóm bạn/đồng nghiệp. Học tối sau giờ làm — rất phù hợp khung 18–21h.</div>
-      <div class="row"><div class="ri">🎯</div><div class="rt">Khóa phù hợp: <strong>Starter & Intermediate</strong></div></div>
-      <div class="row"><div class="ri">📱</div><div class="rt">Kênh: <strong>Facebook</strong> chính — group thể thao, dân văn phòng Q9</div></div>
+      <div class="cl">Nhóm A · Học viên chính</div>
+      <div class="ct">🏢 Dân văn phòng & gia đình · 30–50 tuổi</div>
+      <div class="cb" style="margin-bottom:12px">Thu nhập ổn, tìm sport xã giao, đi nhóm bạn/đồng nghiệp. Học tối sau giờ làm — rất phù hợp 18–22h.</div>
+      <div class="row"><div class="ri">🎯</div><div class="rt">Khóa: <strong>Starter & Intermediate</strong></div></div>
+      <div class="row"><div class="ri">📱</div><div class="rt">Kênh: <strong>Facebook</strong> — group thể thao, dân văn phòng Q9</div></div>
       <div class="row"><div class="ri">💬</div><div class="rt">Hook: <strong>"8 buổi là chơi được — học tối T3 & T5"</strong></div></div>
     </div>
     <div class="card al">
-      <div class="c-lbl">Nhóm B · Học viên tiềm năng</div>
-      <div class="c-title" style="font-size:1.05rem;margin-bottom:10px">🎓 Giới trẻ · 20–35 tuổi</div>
-      <div class="c-body" style="margin-bottom:12px">Muốn học bài bản, thích sport lifestyle, dễ share content — tạo viral tự nhiên và giới thiệu bạn bè.</div>
-      <div class="row"><div class="ri">🎯</div><div class="rt">Khóa phù hợp: <strong>Starter → Advanced → Private</strong></div></div>
-      <div class="row"><div class="ri">📱</div><div class="rt">Kênh: <strong>Facebook Reels + TikTok</strong> — video ngắn, KOC</div></div>
-      <div class="row"><div class="ri">💬</div><div class="rt">Hook: <strong>"Môn hot nhất 2025 — học ngay tại Q9"</strong></div></div>
+      <div class="cl">Nhóm B · Social player</div>
+      <div class="ct">🏸 Dân chơi thể thao có cộng đồng · 20–40 tuổi</div>
+      <div class="cb" style="margin-bottom:12px">Đang chơi cầu lông/tennis/gym. Học Pickleball rất nhanh. Hay đăng story, kéo cả nhóm bạn theo.</div>
+      <div class="row"><div class="ri">🎯</div><div class="rt">Mục tiêu: <strong>Member + kéo viral cộng đồng</strong></div></div>
+      <div class="row"><div class="ri">📱</div><div class="rt">Kênh: <strong>Group cầu lông/tennis Q9</strong> + Reels</div></div>
+      <div class="row"><div class="ri">💬</div><div class="rt">Hook: <strong>"1 buổi thử free — đang chơi vợt học siêu nhanh"</strong></div></div>
     </div>
   </div>
 </div>
 
-<!-- S3 -->
-<div class="section" id="s3">
-  <div class="eyebrow">03 · Lịch học & doanh thu</div>
-  <div class="sec-title">3 SÂN · 3 LỚP<br><em>MỖI TỐI</em></div>
-  <div class="sec-intro">Khung giờ tối 18–21h mỗi ngày. Mỗi sân 1 lớp đồng thời — tối đa 3 lớp/tối, mỗi lớp 6–8 người. Mỗi buổi 2 tiếng.</div>
+<!-- S4: LỊCH HỌC -->
+<div class="sec" id="s4">
+  <div class="ey">04 · Vận hành sân</div>
+  <div class="st">LỊCH HỌC —<br><em>3 SÂN · 6 LỚP/TỐI</em></div>
+  <div class="si">Tối 18–22h mỗi ngày. 3 sân = tối đa 6 lớp đồng thời (2 ca). Thêm ca sáng T7–CN để tối đa hóa công suất.</div>
 
-  <div style="overflow-x:auto;margin-bottom:28px">
-    <table class="sched-tbl">
-      <thead>
-        <tr><th>Giờ</th><th>🏟 Sân 1</th><th>🏟 Sân 2</th><th>🌿 Sân 3</th></tr>
-      </thead>
+  <div style="overflow-x:auto;margin-bottom:20px">
+    <table class="tbl sched">
+      <thead><tr><th style="text-align:left;padding-left:14px">Giờ</th><th>🏟 Sân 1</th><th>🏟 Sân 2</th><th>🌿 Sân 3</th></tr></thead>
       <tbody>
         <tr>
           <td class="tc">18:00–20:00</td>
-          <td><div class="sl sl-g">🌱 Starter<br><small>6–8 người</small></div></td>
-          <td><div class="sl sl-o">⚡ Intermediate<br><small>6–8 người</small></div></td>
-          <td><div class="sl sl-r">🔥 Advanced<br><small>4–6 người</small></div></td>
+          <td><div class="sl slg">🌱 Starter A<br><small>6–8 người</small></div></td>
+          <td><div class="sl slo">⚡ Intermediate A<br><small>6–8 người</small></div></td>
+          <td><div class="sl slr">🔥 Advanced<br><small>4–6 người</small></div></td>
         </tr>
         <tr>
-          <td class="tc">19:00–21:00</td>
-          <td><div class="sl sl-g">🌱 Starter 2<br><small>6–8 người</small></div></td>
-          <td><div class="sl sl-b">👑 Private 1-1<br><small>linh hoạt</small></div></td>
-          <td><div class="sl sl-b">👑 Private 1-1<br><small>linh hoạt</small></div></td>
+          <td class="tc">20:00–22:00</td>
+          <td><div class="sl slg">🌱 Starter B<br><small>6–8 người</small></div></td>
+          <td><div class="sl slo">⚡ Intermediate B<br><small>6–8 người</small></div></td>
+          <td><div class="sl slb">👑 Private slots<br><small>book trước</small></div></td>
+        </tr>
+        <tr>
+          <td class="tc">T7–CN · 7:00–9:00</td>
+          <td><div class="sl slp">🎯 Học thử free<br><small>open class</small></div></td>
+          <td><div class="sl slg">🌱 Starter C<br><small>cuối tuần</small></div></td>
+          <td><div class="sl slb">👑 Private VIP<br><small>weekend</small></div></td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;margin-bottom:14px">DOANH THU <em style="color:var(--lime)">TIỀM NĂNG KHI LẤP ĐẦY</em></div>
-  <div style="overflow-x:auto">
-    <table class="rev-tbl">
-      <thead><tr><th>Khóa học</th><th>Số lớp</th><th>Học viên</th><th>Học phí</th><th>DT/tháng</th></tr></thead>
-      <tbody>
-        <tr><td>🌱 Starter (8 buổi · 2h/buổi)</td><td>3 lớp</td><td>18 người</td><td>2.5tr/người</td><td><span class="rh">7.5tr</span></td></tr>
-        <tr><td>⚡ Intermediate (10 buổi)</td><td>2 lớp</td><td>12 người</td><td>3.8tr/người</td><td><span class="rh">7.6tr</span></td></tr>
-        <tr><td>🔥 Advanced (12 buổi)</td><td>1 lớp</td><td>6 người</td><td>5.5tr/người</td><td><span class="rh">5.5tr</span></td></tr>
-        <tr><td>👑 Private 1-1</td><td>—</td><td>~20 buổi/tháng</td><td>500k/buổi</td><td><span class="rh">10tr</span></td></tr>
-        <tr><td>🎫 Member (phụ)</td><td>—</td><td>50–100 member</td><td>299–499k/th</td><td><span class="rh">~7tr</span></td></tr>
-        <tr><td><strong>TỔNG</strong></td><td></td><td></td><td></td><td><span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--accent)">~37.6TR</span></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="hl" style="margin-top:24px">
-    <div class="hl-title">📊 Mục tiêu thực tế từng tháng</div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
-      <div class="row"><div class="ri">📅</div><div class="rt"><strong style="color:var(--text)">Tháng 1:</strong> Khai giảng 1–2 lớp Starter (12–16 học viên). Doanh thu mục tiêu: <strong>8–12tr</strong></div></div>
-      <div class="row"><div class="ri">📅</div><div class="rt"><strong style="color:var(--text)">Tháng 2:</strong> Thêm Intermediate + Private. Doanh thu: <strong>15–20tr</strong></div></div>
-      <div class="row"><div class="ri">📅</div><div class="rt"><strong style="color:var(--text)">Tháng 3:</strong> 4–5 lớp song song + member tự nhiên. Doanh thu: <strong>25–35tr</strong></div></div>
-    </div>
+  <div class="g3">
+    <div class="card"><div class="cl">🌱 Starter · 8 buổi</div><div class="cn" style="color:var(--green)">2.5TR</div><div class="cb">2h/buổi · max 8 người/lớp · người mới hoàn toàn</div></div>
+    <div class="card"><div class="cl">⚡ Intermediate · 10 buổi</div><div class="cn" style="color:var(--gold)">3.8TR</div><div class="cb">Dinking, drop shot, chiến thuật đôi</div></div>
+    <div class="card"><div class="cl">🔥 Advanced · 12 buổi</div><div class="cn" style="color:var(--red)">5.5TR</div><div class="cb">Thi đấu thực chiến · video phân tích · max 6 người</div></div>
+    <div class="card"><div class="cl">👑 Private 1-1</div><div class="cn" style="color:var(--purple)">500k</div><div class="cb">Mỗi buổi · lộ trình cá nhân hoá · linh hoạt giờ</div></div>
+    <div class="card" style="border-color:var(--lime)"><div class="cl">🎫 Member · 1 tháng</div><div class="cn">499k</div><div class="cb">~16k/ngày · Tặng 5 ly nước · khách thử</div></div>
+    <div class="card" style="border-color:var(--lime)"><div class="cl">🎫 Member · 3 tháng</div><div class="cn">399k<small style="font-size:0.9rem">/th</small></div><div class="cb">~13k/ngày · Tặng 10 ly nước · phổ biến nhất</div></div>
+    <div class="card" style="grid-column:1/-1;border-color:var(--lime)"><div class="cl">🎫 Member · 6 tháng · Best value</div><div style="display:flex;align-items:baseline;gap:12px"><div class="cn">299k<small style="font-size:0.9rem">/th</small></div><div style="font-size:0.78rem;color:var(--mu2)">~9k/ngày · Rẻ hơn ly trà đá · Tặng 20 ly nước · Nhóm 4 người giảm thêm 20%</div></div></div>
   </div>
 </div>
 
-<!-- S4 -->
-<div class="section" id="s4">
-  <div class="eyebrow">04 · Nhân sự giảng dạy</div>
-  <div class="sec-title">TUYỂN & CHÍNH SÁCH<br><em>HLV</em></div>
-  <div class="sec-intro">HLV là xương sống của academy. Tuyển đúng người, đãi ngộ hợp lý — giữ chân được HLV là giữ được học viên.</div>
+<!-- S5: HLV -->
+<div class="sec" id="s5">
+  <div class="ey">05 · Nhân sự giảng dạy</div>
+  <div class="st">TUYỂN &<br><em>CHÍNH SÁCH HLV</em></div>
+  <div class="si">Tuyển theo nhu cầu — không tuyển trước khi có lớp. 2 HLV đầu, thêm dần khi đủ lớp. Chính sách chia % trước, lương cứng sau.</div>
 
-  <div class="g2" style="margin-bottom:24px">
-    <div class="card ag">
-      <div class="c-icon">🔍</div>
-      <div class="c-lbl">Tiêu chí tuyển HLV</div>
-      <div class="c-title">Không cần chứng chỉ ngay — cần người đúng</div>
-      <div class="c-body" style="margin-bottom:12px">Chơi tốt + giao tiếp tốt + có camera presence để quay content. Thử việc 1 tháng trước khi ký hợp đồng.</div>
-      <ul class="li">
-        <li>Đăng tuyển group <strong style="color:var(--text)">Pickleball TP.HCM</strong> trên Facebook</li>
-        <li>Đăng group <strong style="color:var(--text)">Việc làm Thể thao HCM</strong></li>
-        <li>Inbox thẳng CLB Pickleball Q9, Thủ Đức, Bình Dương</li>
-        <li>Thử việc: dạy 1 buổi demo, chấm điểm phản hồi học viên</li>
-        <li>Bắt buộc tham gia quay content 2 video/tháng tại sân</li>
-      </ul>
-    </div>
-    <div class="card al">
-      <div class="c-icon">💰</div>
-      <div class="c-lbl">Chính sách đãi ngộ · 2 giai đoạn</div>
-      <div class="c-title">Chia % trước · Lương cứng sau</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
-        <div style="background:var(--ink);border-radius:8px;padding:12px 14px">
-          <div style="color:var(--gold);font-weight:700;font-size:0.82rem;margin-bottom:6px">🟡 Tháng 1–2 · Chia % (không rủi ro cho sân)</div>
-          <div style="font-size:0.8rem;color:var(--muted2);line-height:1.8">
-            Lớp nhóm: HLV nhận <strong style="color:var(--text)">35%</strong> học phí<br>
-            VD: Starter 8 người × 2.5tr = 20tr → HLV nhận <strong style="color:var(--lime)">7tr</strong><br>
-            Private 1-1: HLV nhận <strong style="color:var(--text)">50%</strong> = <strong style="color:var(--lime)">250k/buổi</strong>
-          </div>
-        </div>
-        <div style="background:var(--ink);border-radius:8px;padding:12px 14px">
-          <div style="color:var(--lime);font-weight:700;font-size:0.82rem;margin-bottom:6px">🟢 Tháng 3+ · Lương cứng + thưởng %</div>
-          <div style="font-size:0.8rem;color:var(--muted2);line-height:1.8">
-            Cứng: <strong style="color:var(--text)">6–8tr/tháng</strong> đảm bảo thu nhập ổn định<br>
-            Thưởng: <strong style="color:var(--text)">20–25%</strong> học phí lớp dạy thêm<br>
-            Private thêm: <strong style="color:var(--text)">40%</strong> mỗi buổi
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="hl">
-    <div class="hl-title">📋 3 điều bắt buộc trong hợp đồng HLV</div>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
-      <div class="row"><div class="ri">1️⃣</div><div class="rt"><strong style="color:var(--text)">Học viên thuộc về sân</strong> — nếu HLV nghỉ, không được kéo học viên theo. Vi phạm bồi thường theo hợp đồng.</div></div>
-      <div class="row"><div class="ri">2️⃣</div><div class="rt"><strong style="color:var(--text)">Tham gia quay content</strong> — tối thiểu 2 video/tháng tại sân. HLV dạy thật trên camera là content convert tốt nhất cho ads.</div></div>
-      <div class="row"><div class="ri">3️⃣</div><div class="rt"><strong style="color:var(--text)">Thử việc 1 tháng</strong> — dạy 1 lớp Starter thử, lấy phản hồi học viên trước khi ký hợp đồng chính thức.</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- S5 -->
-<div class="section" id="s5">
-  <div class="eyebrow">05 · Member (doanh thu phụ)</div>
-  <div class="sec-title">MEMBER —<br><em>UPSELL TỰ NHIÊN</em></div>
-  <div class="sec-intro">Không push bán member mạnh. Học viên xong khóa → tự muốn tiếp tục chơi → mua member. Không cần ads riêng cho member.</div>
-
-  <div class="g3" style="margin-bottom:24px">
-    <div class="card">
-      <div class="c-lbl">Gói 1 Tháng</div>
-      <div class="c-num">499k</div>
-      <div class="c-body">~16k/ngày · Tặng 5 ly nước. Phù hợp học viên vừa hoàn thành khóa muốn thử chơi thêm.</div>
-    </div>
-    <div class="card" style="border-color:var(--lime)">
-      <div class="c-lbl">Gói 3 Tháng · Phổ biến</div>
-      <div class="c-num">399k<small style="font-size:1rem">/th</small></div>
-      <div class="c-body">~13k/ngày · Tặng 10 ly nước. Học viên Intermediate/Advanced hay chọn để duy trì chơi thường xuyên.</div>
-    </div>
-    <div class="card">
-      <div class="c-lbl">Gói 6 Tháng · Best value</div>
-      <div class="c-num">299k<small style="font-size:1rem">/th</small></div>
-      <div class="c-body">~9k/ngày · Tặng 20 ly nước. Dành cho học viên gắn bó lâu dài, hay rủ bạn đến chơi.</div>
-    </div>
-  </div>
-
-  <div class="hl">
-    <div class="hl-title">💡 Upsell member đúng thời điểm — không cần ads</div>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
-      <div class="row"><div class="ri">📍</div><div class="rt"><strong style="color:var(--text)">Buổi học cuối cùng</strong> của mỗi khóa — HLV giới thiệu gói member ngay tại sân. Học viên đang hứng, tỉ lệ chốt 40–60%.</div></div>
-      <div class="row"><div class="ri">🎁</div><div class="rt"><strong style="color:var(--text)">1 tuần chơi thử miễn phí</strong> sau khi hoàn thành khóa — nếm vị member trước khi mua. Tăng chuyển đổi đáng kể.</div></div>
-      <div class="row"><div class="ri">🤝</div><div class="rt"><strong style="color:var(--text)">Rủ nhóm giảm thêm</strong> — 2 người giảm 10%, 4 người giảm 20%. Học viên tự rủ bạn đến, viral tự nhiên.</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- S6 -->
-<div class="section" id="s6">
-  <div class="eyebrow">06 · Facebook Ads</div>
-  <div class="sec-title">CHIẾN LƯỢC<br><em>FACEBOOK ADS</em></div>
-  <div class="sec-intro">Ads tập trung bán khóa học — không phải member. Địa lý: Q9 + Thủ Đức + 5km. Phễu 3 tầng: Reach → Lead → Chốt lớp học.</div>
-
-  <div class="g3" style="margin-bottom:28px">
-    <div class="card ab">
-      <div class="c-lbl">Tầng 1 · Awareness</div>
-      <div class="c-title">🎯 Reach & Video Views</div>
-      <div class="c-body" style="margin-bottom:10px">Budget: <strong style="color:var(--lime)">3–5tr/tháng</strong></div>
-      <ul class="li">
-        <li>Video HLV dạy thật tại sân 15–30s — không dàn dựng</li>
-        <li>"Học Pickleball mấy buổi là chơi được?" — giáo dục thị trường</li>
-        <li>Target: 25–50t, Q9/Thủ Đức, interest thể thao, cầu lông, tennis</li>
-        <li>Lookalike từ page followers hiện tại</li>
-      </ul>
-    </div>
-    <div class="card ag">
-      <div class="c-lbl">Tầng 2 · Lead Gen</div>
-      <div class="c-title">💬 Message & Đăng Ký</div>
-      <div class="c-body" style="margin-bottom:10px">Budget: <strong style="color:var(--lime)">5–8tr/tháng</strong></div>
-      <ul class="li">
-        <li>Ads dẫn về Messenger/Zalo — tư vấn khóa học</li>
-        <li>Lead form: "Đăng ký học thử 1 buổi miễn phí Thứ 7"</li>
-        <li>Retarget người xem video 50%+ chưa inbox</li>
-        <li>Creative: lịch học cụ thể — "Tối T3 & T5, 18h–20h"</li>
-      </ul>
-    </div>
-    <div class="card al">
-      <div class="c-lbl">Tầng 3 · Conversion</div>
-      <div class="c-title">💰 Chốt Học Viên</div>
-      <div class="c-body" style="margin-bottom:10px">Budget: <strong style="color:var(--lime)">4–7tr/tháng</strong></div>
-      <ul class="li">
-        <li>Retarget người đã inbox chưa đăng ký</li>
-        <li>"Còn 3 suất lớp Starter khai giảng Thứ 2 tới"</li>
-        <li>Video testimonial học viên sau khóa học</li>
-        <li>Đẩy event học thử Thứ 7 hàng tuần</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="cx">
-    <div class="cx-type">🎬 Video Ad · Khóa Starter · 15 giây</div>
-    <div class="cx-hook">"8 buổi là chơi được Pickleball — học tối Thứ 3 & Thứ 5 tại Q9 🏓"</div>
-    <div class="cx-body">HLV dạy học viên thật → cut sang "Lớp Starter khai giảng [ngày]. Còn 4 suất". CTA: Inbox để được tư vấn miễn phí.</div>
-  </div>
-  <div class="cx">
-    <div class="cx-type">📸 Carousel · Lộ trình 4 cấp độ</div>
-    <div class="cx-hook">"Chưa biết chơi? Không sao — học từ đầu, 4 cấp độ rõ ràng 🎯"</div>
-    <div class="cx-body">Slide 1: Hook. Slide 2: Starter 8 buổi. Slide 3: Intermediate. Slide 4: Advanced. Slide 5: "Thứ 7 này học thử MIỄN PHÍ".</div>
-  </div>
-  <div class="cx">
-    <div class="cx-type">👥 Post group · Rủ bạn học cùng</div>
-    <div class="cx-hook">"Rủ cả nhóm học cùng — 4 người giảm 20% học phí 🤝"</div>
-    <div class="cx-body">Chạy trong group thể thao Q9, Thủ Đức. Format tag bạn bè. Boost 300k cuối tuần. Comment = lead tự nhiên.</div>
-  </div>
-</div>
-
-<!-- S7 -->
-<div class="section" id="s7">
-  <div class="eyebrow">07 · KOC Mini</div>
-  <div class="sec-title">CHIẾN DỊCH<br><em>KOC MINI</em></div>
-  <div class="sec-intro">Ưu tiên KOC thể thao & lifestyle gần Q9. Nội dung: hành trình học từ buổi 1 đến khi chơi được — before/after rất viral.</div>
-
-  <div class="g3" style="margin-bottom:28px">
-    <div class="koc-card" style="border-left:3px solid var(--green)">
-      <div class="koc-tier">Tier 1 · Nano KOC</div>
-      <div class="koc-name">KOC Cộng Đồng Q9</div>
-      <div class="koc-f">5K–20K</div>
-      <div class="koc-fl">followers Facebook/TikTok</div>
-      <div class="tags"><span class="tag tgr">Lifestyle</span><span class="tag tb">Thể thao</span><span class="tag tl">Q9/Thủ Đức</span></div>
-      <div class="koc-r"><span class="koc-k">Số lượng</span><span class="koc-v">5–8 người</span></div>
-      <div class="koc-r"><span class="koc-k">Chi phí</span><span class="koc-v" style="color:var(--lime)">Free 1 khóa + 500k</span></div>
-      <div class="koc-r"><span class="koc-k">Deliverable</span><span class="koc-v">2 Reel + 3 story</span></div>
-      <div class="koc-r"><span class="koc-k">Nội dung</span><span class="koc-v">Hành trình học từ đầu</span></div>
-    </div>
-    <div class="koc-card" style="border-left:3px solid var(--gold)">
-      <div class="koc-tier">Tier 2 · Micro KOC</div>
-      <div class="koc-name">KOC Thể Thao / Mẹ Bỉm</div>
-      <div class="koc-f">20K–100K</div>
-      <div class="koc-fl">followers Facebook/TikTok</div>
-      <div class="tags"><span class="tag tg">Sport</span><span class="tag tr">Gia đình</span><span class="tag tb">HCM</span></div>
-      <div class="koc-r"><span class="koc-k">Số lượng</span><span class="koc-v">2–3 người</span></div>
-      <div class="koc-r"><span class="koc-k">Chi phí</span><span class="koc-v" style="color:var(--lime)">2tr–5tr/chiến dịch</span></div>
-      <div class="koc-r"><span class="koc-k">Deliverable</span><span class="koc-v">1 video dài + 2 story</span></div>
-      <div class="koc-r"><span class="koc-k">Nội dung</span><span class="koc-v">Review khóa học thật</span></div>
-    </div>
-    <div class="koc-card" style="border-left:3px solid var(--blue)">
-      <div class="koc-tier">Tier 3 · Học viên Seeding</div>
-      <div class="koc-name">Học Viên Thật</div>
-      <div class="koc-f">Bất kỳ</div>
-      <div class="koc-fl">học viên đầu tiên của sân</div>
-      <div class="tags"><span class="tag tb">Organic</span><span class="tag tl">Word of mouth</span></div>
-      <div class="koc-r"><span class="koc-k">Số lượng</span><span class="koc-v">10–15 người</span></div>
-      <div class="koc-r"><span class="koc-k">Chi phí</span><span class="koc-v" style="color:var(--lime)">Giảm 30% học phí</span></div>
-      <div class="koc-r"><span class="koc-k">Deliverable</span><span class="koc-v">Check-in, story, review</span></div>
-      <div class="koc-r"><span class="koc-k">Nội dung</span><span class="koc-v">Social proof thật nhất</span></div>
-    </div>
-  </div>
-
-  <div class="hl">
-    <div class="hl-title">📌 Cách tiếp cận KOC đúng cách</div>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
-      <div class="row"><div class="ri">1️⃣</div><div class="rt">Tìm KOC trong group <strong style="color:var(--text)">Pickleball TP.HCM</strong>, <strong style="color:var(--text)">Thể thao Thủ Đức</strong>, <strong style="color:var(--text)">Mẹ bỉm Q9</strong></div></div>
-      <div class="row"><div class="ri">2️⃣</div><div class="rt">DM: <em style="color:var(--muted2)">"Mời anh/chị trải nghiệm 1 khóa học miễn phí và hợp tác content về hành trình học Pickleball"</em></div></div>
-      <div class="row"><div class="ri">3️⃣</div><div class="rt">Yêu cầu: <strong style="color:var(--text)">quay hành trình từ buổi 1 → buổi cuối</strong> — before/after rất mạnh, dễ viral</div></div>
-      <div class="row"><div class="ri">4️⃣</div><div class="rt"><strong style="color:var(--text)">Xin quyền dùng video làm ads</strong> — video KOC học thật convert tốt hơn video dàn dựng 3–5 lần</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- S8 -->
-<div class="section" id="s8">
-  <div class="eyebrow">08 · Lịch content</div>
-  <div class="sec-title">CONTENT<br><em>HÀNG TUẦN</em></div>
-  <div class="sec-intro">Đăng 5–7 ngày/tuần. Tỉ lệ 4:3:3 — giáo dục : cộng đồng : bán hàng. Tập trung vào HLV dạy thật và hành trình học viên.</div>
-
-  <div class="g2">
-    <div class="card">
-      <div class="c-lbl">Thứ 2 + Thứ 4 · Giáo dục</div>
-      <div class="c-title">📚 Kỹ thuật Pickleball</div>
-      <ul class="li" style="margin-top:8px">
-        <li>Video HLV dạy 1 kỹ thuật: serve, dink, drop shot</li>
-        <li>"5 lỗi sai phổ biến người mới hay mắc"</li>
-        <li>"Pickleball vs Cầu lông — khác nhau điều gì?"</li>
-        <li>Tips chọn vợt, giày cho người mới</li>
-      </ul>
-    </div>
-    <div class="card">
-      <div class="c-lbl">Thứ 3 + Thứ 6 · Cộng đồng</div>
-      <div class="c-title">🎥 Hành trình học viên</div>
-      <ul class="li" style="margin-top:8px">
-        <li>Before/after: "Buổi 1 vs Buổi 8 của học viên A"</li>
-        <li>Clip vui: pha bóng hài hước trong lớp học</li>
-        <li>"Một buổi tối học Pickleball tại Global City"</li>
-        <li>Giới thiệu HLV và phương pháp dạy</li>
-      </ul>
-    </div>
-    <div class="card">
-      <div class="c-lbl">Thứ 5 + Thứ 7 · Bán khóa học</div>
-      <div class="c-title">💰 Offer & Lịch khai giảng</div>
-      <ul class="li" style="margin-top:8px">
-        <li>Lịch khai giảng + còn bao nhiêu suất</li>
-        <li>"Học thử miễn phí Thứ 7 sáng — link đăng ký"</li>
-        <li>Testimonial video học viên hoàn thành khóa</li>
-        <li>"Sau 8 buổi bạn sẽ làm được gì"</li>
-      </ul>
-    </div>
-    <div class="card">
-      <div class="c-lbl">Chủ Nhật · Engagement</div>
-      <div class="c-title">🏆 Cộng đồng & Giải trí</div>
-      <ul class="li" style="margin-top:8px">
-        <li>Livestream thi đấu giao hữu học viên</li>
-        <li>Mini game: "Đoán kỹ thuật này tên gì?"</li>
-        <li>Ảnh nhóm lớp học tuần này</li>
-        <li>Poll: "Bạn muốn học kỹ thuật gì tiếp theo?"</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-<!-- S9 -->
-<div class="section" id="s9">
-  <div class="eyebrow">09 · Kế hoạch thực thi</div>
-  <div class="sec-title">TIMELINE<br><em>90 NGÀY</em></div>
-  <div class="sec-intro">Ưu tiên số 1: có HLV và khai giảng lớp đầu tiên. Mọi hoạt động marketing đều phục vụ mục tiêu này.</div>
-
-  <div class="tl">
-    <div class="tl-item">
-      <div><div class="tl-wk">THÁNG 1<br>Tuần 1–2</div><div class="tl-wk-s">Xây nền</div></div>
-      <div>
-        <div class="tl-t">🏗️ Tuyển HLV + Chuẩn bị khai giảng</div>
-        <div class="tags"><span class="tag tgr">HLV</span><span class="tag tg">Content</span><span class="tag tb">Page</span></div>
-        <ul class="li">
-          <li>Đăng tuyển HLV ngay — phỏng vấn, thử việc demo 1 buổi</li>
-          <li>Thuê thợ quay nửa ngày tại sân — 2–3tr, có nguyên liệu cả tháng</li>
-          <li>Setup fanpage: avatar, cover, info đầy đủ, đăng 10 bài đầu</li>
-          <li>Tạo group "Cộng đồng Pickleball Q9 – Thủ Đức"</li>
-          <li>Thiết kế lịch khai giảng + bảng học phí đẹp để đăng lên page</li>
-          <li>Liên hệ 5–8 KOC nano — mời học thử miễn phí đổi content</li>
-        </ul>
-      </div>
-    </div>
-    <div class="tl-item">
-      <div><div class="tl-wk">THÁNG 1<br>Tuần 3–4</div><div class="tl-wk-s">Ra mắt</div></div>
-      <div>
-        <div class="tl-t">🚀 Khai giảng lớp Starter đầu tiên</div>
-        <div class="tags"><span class="tag tl">Khai giảng</span><span class="tag tr">Ads</span><span class="tag tg">KOC</span></div>
-        <ul class="li">
-          <li>Buổi học thử miễn phí Thứ 7 đầu tiên — quay toàn bộ làm content</li>
-          <li>Bật Facebook Ads tầng 1 (video HLV dạy) — 3tr tháng đầu</li>
-          <li>KOC nano bắt đầu quay hành trình học từ buổi 1</li>
-          <li>Nhắn 20 người quen mời học thử — lớp đầu luôn từ network cá nhân</li>
-          <li>Mục tiêu: <strong>khai giảng 1–2 lớp Starter · 12–16 học viên</strong></li>
-        </ul>
-      </div>
-    </div>
-    <div class="tl-item">
-      <div><div class="tl-wk">THÁNG 2<br>Tuần 5–8</div><div class="tl-wk-s">Tăng tốc</div></div>
-      <div>
-        <div class="tl-t">📈 Mở thêm lớp + Scale ads</div>
-        <div class="tags"><span class="tag tl">Scale</span><span class="tag tg">KOC Micro</span><span class="tag tb">Member</span></div>
-        <ul class="li">
-          <li>Bật ads tầng 2 — retarget người xem 50%+ video</li>
-          <li>Book 2 KOC Micro (20k–100k follow) — ngân sách 4–8tr</li>
-          <li>Khai giảng Intermediate cho học viên Starter hoàn thành</li>
-          <li>Mở Private coaching — upsell cho học viên muốn học nhanh</li>
-          <li>Học viên Starter xong → offer 1 tuần member thử miễn phí</li>
-          <li>Mục tiêu: <strong>4–5 lớp chạy song song</strong></li>
-        </ul>
-      </div>
-    </div>
-    <div class="tl-item">
-      <div><div class="tl-wk">THÁNG 3<br>Tuần 9–12</div><div class="tl-wk-s">Ổn định</div></div>
-      <div>
-        <div class="tl-t">🏆 Mini Tournament + Xây cộng đồng</div>
-        <div class="tags"><span class="tag tr">Tournament</span><span class="tag tgr">Retention</span><span class="tag tl">Advanced</span></div>
-        <ul class="li">
-          <li>Tổ chức mini tournament nội bộ — livestream, content viral</li>
-          <li>Mở lớp Advanced cho học viên Intermediate hoàn thành</li>
-          <li>Chuyển HLV tốt sang lương cứng 6–8tr + % — giữ chân dài hạn</li>
-          <li>Tối ưu ads: tắt creative kém, scale creative tốt nhất</li>
-          <li>Mục tiêu: <strong>25–35tr doanh thu/tháng · 30–50 member tự nhiên</strong></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- S10 -->
-<div class="section" id="s10">
-  <div class="eyebrow">10 · Ngân sách & KPI</div>
-  <div class="sec-title">PHÂN BỔ<br><em>NGÂN SÁCH</em></div>
-  <div class="sec-intro">Tổng 15–30tr/tháng. Tháng đầu ưu tiên content & sản xuất. Tháng 2–3 tăng ads khi đã có social proof và testimonial thật.</div>
-
-  <!-- Budget visual bars -->
-  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px">
-    <div style="display:flex;align-items:center;gap:16px">
-      <div style="width:200px;flex-shrink:0">
-        <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">🎯 Facebook Ads</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--lime);line-height:1">10TR</div>
-      </div>
-      <div style="flex:1;height:10px;background:var(--border2);border-radius:50px;overflow:hidden">
-        <div style="width:66.7%;height:100%;background:var(--lime);border-radius:50px"></div>
-      </div>
-      <div style="font-size:0.8rem;color:var(--muted2);width:40px;text-align:right">66.7%</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:16px">
-      <div style="width:200px;flex-shrink:0">
-        <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">🌟 Nano KOC</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--gold);line-height:1">3.5TR</div>
-      </div>
-      <div style="flex:1;height:10px;background:var(--border2);border-radius:50px;overflow:hidden">
-        <div style="width:23.3%;height:100%;background:var(--gold);border-radius:50px"></div>
-      </div>
-      <div style="font-size:0.8rem;color:var(--muted2);width:40px;text-align:right">23.3%</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:16px">
-      <div style="width:200px;flex-shrink:0">
-        <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">📱 Vận hành Fanpage</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--blue);line-height:1">1.5TR</div>
-      </div>
-      <div style="flex:1;height:10px;background:var(--border2);border-radius:50px;overflow:hidden">
-        <div style="width:10%;height:100%;background:var(--blue);border-radius:50px"></div>
-      </div>
-      <div style="font-size:0.8rem;color:var(--muted2);width:40px;text-align:right">10%</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:16px;padding-top:12px;border-top:1px solid var(--border2)">
-      <div style="width:200px;flex-shrink:0">
-        <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">TỔNG / THÁNG</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--accent);line-height:1">15TR</div>
-      </div>
-      <div style="flex:1;height:10px;background:linear-gradient(90deg,var(--lime) 66.7%,var(--gold) 66.7% 90%,var(--blue) 90%);border-radius:50px"></div>
-      <div style="font-size:0.8rem;color:var(--lime);width:40px;text-align:right;font-weight:700">Fix</div>
-    </div>
-  </div>
-
-  <table class="bt" style="margin-bottom:40px">
-    <thead><tr><th>Hạng mục</th><th>Số tiền/tháng</th><th>Tỉ trọng</th><th>Cách dùng cụ thể</th></tr></thead>
+  <table class="tbl" style="margin-bottom:20px">
+    <thead><tr><th>HLV</th><th>Giai đoạn</th><th>Lớp phụ trách</th><th>Tháng 1–2 (chia %)</th><th>Tháng 3+ (cứng+%)</th></tr></thead>
     <tbody>
       <tr>
-        <td><strong>🎯 Facebook Ads</strong><br><small style="color:var(--muted)">Ad spend trực tiếp vào Meta</small></td>
-        <td><span class="bamt">10TR</span></td>
-        <td style="color:var(--lime);font-weight:700">66.7%</td>
-        <td style="font-size:0.78rem;color:var(--muted2)">
-          Tầng 1 Awareness (video HLV dạy): <strong style="color:var(--text)">3tr</strong><br>
-          Tầng 2 Lead Gen (inbox/đăng ký): <strong style="color:var(--text)">4tr</strong><br>
-          Tầng 3 Retarget chốt lớp: <strong style="color:var(--text)">3tr</strong>
-        </td>
+        <td><strong>HLV 1 · Senior</strong><br><small style="color:var(--mu)">Chơi tốt · có presence · dạy được Intermediate</small></td>
+        <td><span style="color:var(--gold);font-size:0.75rem">Từ tháng 1</span></td>
+        <td style="font-size:0.78rem">Starter A, Intermediate, Private<br><small style="color:var(--mu)">~3 lớp/tối + private</small></td>
+        <td><span style="color:var(--lime);font-weight:700">35% lớp + 50% private</span><br><small style="color:var(--mu)">Ước ~15–20TR/th</small></td>
+        <td><span style="color:var(--lime);font-weight:700">8–10TR cứng + 25%</span></td>
       </tr>
       <tr>
-        <td><strong>🌟 Nano KOC</strong><br><small style="color:var(--muted)">Book KOC 5k–20k follow</small></td>
-        <td><span class="bamt" style="color:var(--gold)">3.5TR</span></td>
-        <td style="color:var(--gold);font-weight:700">23.3%</td>
-        <td style="font-size:0.78rem;color:var(--muted2)">
-          5–7 KOC nano/tháng × ~500k/người<br>
-          Yêu cầu: 2 Reel + 3 story quay hành trình học<br>
-          Xin quyền dùng lại video làm ads
-        </td>
+        <td><strong>HLV 2 · Junior</strong><br><small style="color:var(--mu)">Dạy Starter tốt · giao tiếp tốt</small></td>
+        <td><span style="color:var(--gold);font-size:0.75rem">Tháng 1–2</span></td>
+        <td style="font-size:0.78rem">Starter B + C cuối tuần<br><small style="color:var(--mu)">~2–3 lớp/tối</small></td>
+        <td><span style="color:var(--lime);font-weight:700">35% lớp nhóm</span><br><small style="color:var(--mu)">Ước ~10–14TR/th</small></td>
+        <td><span style="color:var(--lime);font-weight:700">6–8TR cứng + 20%</span></td>
       </tr>
       <tr>
-        <td><strong>📱 Vận hành Fanpage</strong><br><small style="color:var(--muted)">Content, thiết kế, quản lý page</small></td>
-        <td><span class="bamt" style="color:var(--blue)">1.5TR</span></td>
-        <td style="color:var(--blue);font-weight:700">10%</td>
-        <td style="font-size:0.78rem;color:var(--muted2)">
-          Đăng bài 5–7 ngày/tuần<br>
-          Thiết kế ảnh bảng giá, lịch học<br>
-          Trả lời inbox, quản lý comment
-        </td>
-      </tr>
-      <tr class="bt-tot">
-        <td><strong>TỔNG CỐ ĐỊNH / THÁNG</strong></td>
-        <td><span class="bamt bamt-tot">15TR</span></td>
-        <td style="color:var(--accent);font-weight:700">100%</td>
-        <td style="font-size:0.78rem;color:var(--muted2)">Ngân sách cố định, không đổi mỗi tháng</td>
+        <td><strong>HLV 3–4</strong><br><small style="color:var(--mu)">Tuyển khi có 7+ lớp/tối</small></td>
+        <td><span style="color:var(--green);font-size:0.75rem">Tháng 3–4</span></td>
+        <td style="font-size:0.78rem">Advanced + thêm Intermediate<br><small style="color:var(--mu)">Khi scale lên</small></td>
+        <td><span style="color:var(--lime);font-weight:700">35% lớp + 50% private</span></td>
+        <td><span style="color:var(--lime);font-weight:700">6–8TR cứng + 20%</span></td>
       </tr>
     </tbody>
   </table>
 
-  <div class="hl" style="margin-bottom:32px">
-    <div class="hl-title">💡 Cách phân bổ 10tr Ads hiệu quả nhất</div>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
-      <div class="row"><div class="ri">📅</div><div class="rt"><strong style="color:var(--text)">Tháng 1 — chạy nhẹ:</strong> 5tr ads + 3.5tr KOC + 1.5tr fanpage = 10tr. Giữ 5tr dự phòng học hỏi, tối ưu creative.</div></div>
-      <div class="row"><div class="ri">📅</div><div class="rt"><strong style="color:var(--text)">Tháng 2 — full gas:</strong> 10tr ads + 3.5tr KOC + 1.5tr fanpage = 15tr. Đã có testimonial, ads bắt đầu convert tốt.</div></div>
-      <div class="row"><div class="ri">📅</div><div class="rt"><strong style="color:var(--text)">Tháng 3 — tối ưu:</strong> Tắt creative kém, dồn tiền vào 2–3 creative tốt nhất. Cost/lead phải xuống dưới <strong>50k</strong>.</div></div>
-    </div>
+  <div class="hl">
+    <div class="hlt">📋 Hợp đồng HLV — 3 điều bắt buộc</div>
+    <div class="row"><div class="ri">1️⃣</div><div class="rt"><em>Học viên thuộc về sân</em> — HLV nghỉ không được kéo học viên theo. Vi phạm bồi thường.</div></div>
+    <div class="row"><div class="ri">2️⃣</div><div class="rt"><em>Bắt buộc quay content</em> — 2 video/tháng tại sân. Điều kiện làm việc, không phải khuyến khích.</div></div>
+    <div class="row"><div class="ri">3️⃣</div><div class="rt"><em>Thử việc 1 tháng</em> — dạy 1 lớp Starter thử, lấy phản hồi học viên trước khi ký chính thức.</div></div>
   </div>
 
-  <!-- UNIT ECONOMICS -->
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;margin-bottom:18px">UNIT ECONOMICS <em style="color:var(--lime)">THỰC TẾ</em></div>
+  <div class="hl" style="margin-top:12px">
+    <div class="hlt">🔍 Tìm HLV ở đâu ngay?</div>
+    <div class="row"><div class="ri">📍</div><div class="rt">Group <strong>Pickleball TP.HCM</strong> trên Facebook — đăng tuyển + inbox thẳng người chơi tốt</div></div>
+    <div class="row"><div class="ri">📍</div><div class="rt">Group <strong>Việc làm Thể thao HCM</strong></div></div>
+    <div class="row"><div class="ri">📍</div><div class="rt">Inbox thẳng CLB Pickleball <strong>Q9, Thủ Đức, Bình Dương</strong></div></div>
+  </div>
+</div>
 
-  <div class="g4" style="margin-bottom:24px">
-    <div class="card al">
-      <div class="c-lbl">Cost Per Student</div>
-      <div class="c-num">500k</div>
-      <div class="c-body">10tr ads → 20 học viên. Kịch bản tích cực làm baseline.</div>
-    </div>
+<!-- S6: MEMBER -->
+<div class="sec" id="s6">
+  <div class="ey">06 · Chiến lược member</div>
+  <div class="st">165 MEMBER —<br><em>XÂY TRONG 4 THÁNG</em></div>
+  <div class="si">Member không bán được ngay — cần tích lũy. 3 nguồn chính, không cần ads riêng cho member.</div>
+
+  <div class="g3" style="margin-bottom:20px">
     <div class="card ag">
-      <div class="c-lbl">Doanh thu / học viên</div>
-      <div class="c-num">3.15tr</div>
-      <div class="c-body">Mix 50/50 Starter 2.5tr + Intermediate 3.8tr trung bình.</div>
-    </div>
-    <div class="card agr">
-      <div class="c-lbl">ROAS</div>
-      <div class="c-num">6.3x</div>
-      <div class="c-body">63tr doanh thu / 10tr ad spend. Rất tốt nếu duy trì được.</div>
+      <div class="cl">Nguồn 1 · Lớn nhất</div>
+      <div class="ct">🎓 Học viên cũ xong khóa</div>
+      <div class="cb" style="margin-bottom:10px">Tỉ lệ chuyển đổi mục tiêu: <strong style="color:var(--text)">50%</strong>. 46 HV mới/tháng → ~23 member/tháng.</div>
+      <div class="row"><div class="ri">🎯</div><div class="rt">Offer buổi học cuối: 1 tuần chơi thử miễn phí</div></div>
+      <div class="row"><div class="ri">💬</div><div class="rt">HLV giới thiệu gói khi học viên đang hứng nhất</div></div>
     </div>
     <div class="card ab">
-      <div class="c-lbl">Hòa vốn marketing</div>
-      <div class="c-num">5 HV</div>
-      <div class="c-body">Chỉ cần 5 học viên/tháng là đủ bù 15tr chi phí marketing.</div>
+      <div class="cl">Nguồn 2 · Social player</div>
+      <div class="ct">🏆 Dân thể thao có cộng đồng</div>
+      <div class="cb" style="margin-bottom:10px">Cầu lông, tennis, gym — mời thử 1 buổi free, chốt member ngay tại sân. 1 người = kéo 3–5 người.</div>
+      <div class="row"><div class="ri">🎯</div><div class="rt">Không cần học khóa — thử buổi, thích, mua member</div></div>
+      <div class="row"><div class="ri">💬</div><div class="rt">Mini tournament hàng tháng → FOMO mạnh</div></div>
+    </div>
+    <div class="card agr">
+      <div class="cl">Nguồn 3 · Referral</div>
+      <div class="ct">🤝 Member giới thiệu member</div>
+      <div class="cb" style="margin-bottom:10px">Giới thiệu 1 người → tặng 1 tháng free. Nhóm 4 người cùng đăng ký → giảm 20%.</div>
+      <div class="row"><div class="ri">🎯</div><div class="rt">Corporate: liên hệ HR công ty Q9 — 10+ người/deal</div></div>
+      <div class="row"><div class="ri">💬</div><div class="rt">Group chung cư Vinhomes, Masteri Q9</div></div>
     </div>
   </div>
 
-  <!-- 3 SCENARIOS -->
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;margin-bottom:18px">3 KỊCH BẢN <em style="color:var(--lime)">THỰC TẾ</em></div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;margin-bottom:12px">LỘ TRÌNH <em style="color:var(--lime)">TÍCH LŨY</em></div>
+  <div class="mb-row">
+    <div class="mb-item"><div class="mb-v" style="color:var(--mu2)">10–20</div><div class="mb-l">Tháng 1</div></div>
+    <div class="mb-item"><div class="mb-v" style="color:var(--gold)">40–60</div><div class="mb-l">Tháng 2</div></div>
+    <div class="mb-item"><div class="mb-v" style="color:var(--green)">90–120</div><div class="mb-l">Tháng 3</div></div>
+    <div class="mb-item"><div class="mb-v" style="color:var(--lime)">165+</div><div class="mb-l">Tháng 4–5</div></div>
+  </div>
+</div>
 
-  <div style="overflow-x:auto;margin-bottom:24px">
-    <table class="bt">
-      <thead>
-        <tr>
-          <th>Chỉ số</th>
-          <th style="color:var(--green)">🟢 Tích cực</th>
-          <th style="color:var(--gold)">🟡 Trung bình</th>
-          <th style="color:var(--accent)">🔴 Xấu</th>
-        </tr>
-      </thead>
+<!-- S7: SOCIAL -->
+<div class="sec" id="s7">
+  <div class="ey">07 · Đánh social</div>
+  <div class="st">NHẮM VÀO<br><em>DÂN CHƠI SOCIAL</em></div>
+  <div class="si">1 người social player = 3–5 member tiếp theo. Đây là kênh tăng trưởng chi phí thấp nhất sau tháng 2.</div>
+
+  <div class="g2" style="margin-bottom:20px">
+    <div class="card al">
+      <div class="cl">Chân dung · Dân social</div>
+      <div class="ct">🏸 Đang chơi cầu lông / tennis / gym</div>
+      <div class="row" style="margin-top:10px"><div class="ri">👤</div><div class="rt"><em>25–45 tuổi</em>, active lifestyle, hay đăng story thể thao hàng ngày</div></div>
+      <div class="row"><div class="ri">📍</div><div class="rt">Sống Q9, Thủ Đức, Bình Dương — bán kính 5km quanh sân</div></div>
+      <div class="row"><div class="ri">👥</div><div class="rt">Hay đi <em>nhóm 4–6 người</em> — 1 người kéo cả nhóm</div></div>
+      <div class="row"><div class="ri">💬</div><div class="rt">Hook: <strong>"Đang chơi vợt rồi — học Pickleball siêu nhanh, 1 buổi thử free"</strong></div></div>
+    </div>
+    <div class="card ab">
+      <div class="cl">Cơ chế 4 bước</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+        <div style="background:var(--ink);border-radius:8px;padding:10px 12px"><div style="font-size:0.68rem;font-weight:700;color:var(--blue);margin-bottom:2px">① Mời thử</div><div style="font-size:0.76rem;color:var(--mu2)">DM/comment: 1 buổi chơi thử miễn phí, không ràng buộc</div></div>
+        <div style="background:var(--ink);border-radius:8px;padding:10px 12px"><div style="font-size:0.68rem;font-weight:700;color:var(--lime);margin-bottom:2px">② Trải nghiệm tại sân</div><div style="font-size:0.76rem;color:var(--mu2)">Chơi vui → quay story → tag sân. HLV dạy sơ để họ "chơi được"</div></div>
+        <div style="background:var(--ink);border-radius:8px;padding:10px 12px"><div style="font-size:0.68rem;font-weight:700;color:var(--gold);margin-bottom:2px">③ Chốt member ngay tại sân</div><div style="font-size:0.76rem;color:var(--mu2)">Offer gói member + giảm 20% nếu rủ thêm 3 bạn. Tỉ lệ 40–60%</div></div>
+        <div style="background:var(--ink);border-radius:8px;padding:10px 12px"><div style="font-size:0.68rem;font-weight:700;color:var(--green);margin-bottom:2px">④ Họ tự kéo cộng đồng</div><div style="font-size:0.76rem;color:var(--mu2)">Đăng story → bạn bè hỏi → viral organic, không tốn thêm tiền</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hl">
+    <div class="hlt">🏆 Mini Tournament — vũ khí social mạnh nhất</div>
+    <div class="row"><div class="ri">📅</div><div class="rt"><em>Tổ chức mỗi tháng 1 lần</em> — chỉ dành cho member. Tạo FOMO với người ngoài.</div></div>
+    <div class="row"><div class="ri">📱</div><div class="rt"><em>Livestream + clip highlights</em> — member tự share story, Facebook. Content free, reach organic.</div></div>
+    <div class="row"><div class="ri">🏅</div><div class="rt"><em>Trao giải nhỏ</em> — áo, vợt, voucher. Người thắng tự đăng ảnh tag sân. Social proof mạnh nhất.</div></div>
+    <div class="row"><div class="ri">👥</div><div class="rt"><em>Cho member mang 1 khách vào xem</em> — cách kéo người mới tự nhiên nhất, không tốn chi phí.</div></div>
+  </div>
+
+  <div class="g3">
+    <div class="card"><div class="cl">Group cần tiếp cận</div><div class="ct">🏸 Cầu lông · Tennis · Cầu mây</div><div class="cb">Chơi vợt học Pickleball rất nhanh. Tỉ lệ thích cao nhất. Inbox trực tiếp thành viên group cầu lông Q9, Thủ Đức.</div></div>
+    <div class="card"><div class="cl">Group cần tiếp cận</div><div class="ct">💪 Gym · Yoga · Chạy bộ</div><div class="cb">Active lifestyle, sẵn thử môn mới. Hay đăng story mỗi ngày — đây là KOC tự nhiên nếu họ thích sân.</div></div>
+    <div class="card"><div class="cl">Group cần tiếp cận</div><div class="ct">🏘️ Chung cư · KDC · Công ty</div><div class="cb">Group chung cư Vinhomes, Masteri Q9. Liên hệ BQL tổ chức buổi giới thiệu Pickleball. 1 event = 10–20 lead.</div></div>
+  </div>
+</div>
+
+<!-- S8: ADS -->
+<div class="sec" id="s8">
+  <div class="ey">08 · Facebook Ads</div>
+  <div class="st">20TR ADS —<br><em>PHÂN BỔ CỤ THỂ</em></div>
+  <div class="si">Ads tập trung bán khóa học. Member không cần ads — upsell từ học viên và social. Phễu 3 tầng.</div>
+
+  <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px">
+    <div class="pbar"><div class="pbar-l"><div class="pbar-lv" style="color:var(--lime)">5TR</div><div class="pbar-ll">🎯 Khóa học · Awareness</div></div><div class="pbar-track"><div class="pbar-fill" style="width:25%;background:var(--lime)"></div></div><div class="pbar-pct">25%</div></div>
+    <div class="pbar"><div class="pbar-l"><div class="pbar-lv" style="color:var(--gold)">7TR</div><div class="pbar-ll">💬 Khóa học · Lead Gen</div></div><div class="pbar-track"><div class="pbar-fill" style="width:35%;background:var(--gold)"></div></div><div class="pbar-pct">35%</div></div>
+    <div class="pbar"><div class="pbar-l"><div class="pbar-lv" style="color:var(--red)">5TR</div><div class="pbar-ll">🔄 Retarget · Chốt lớp</div></div><div class="pbar-track"><div class="pbar-fill" style="width:25%;background:var(--red)"></div></div><div class="pbar-pct">25%</div></div>
+    <div class="pbar"><div class="pbar-l"><div class="pbar-lv" style="color:var(--blue)">3TR</div><div class="pbar-ll">📱 Boost post · Social</div></div><div class="pbar-track"><div class="pbar-fill" style="width:15%;background:var(--blue)"></div></div><div class="pbar-pct">15%</div></div>
+    <div class="pbar" style="padding-top:9px;border-top:1px solid var(--b2)"><div class="pbar-l"><div class="pbar-lv" style="color:var(--red);font-size:1.7rem">20TR</div><div class="pbar-ll">TỔNG CỐ ĐỊNH/THÁNG</div></div><div class="pbar-track"><div style="height:7px;background:linear-gradient(90deg,var(--lime) 25%,var(--gold) 25% 60%,var(--red) 60% 85%,var(--blue) 85%);border-radius:50px"></div></div><div class="pbar-pct" style="color:var(--lime)">Fix</div></div>
+  </div>
+
+  <div class="cx"><div class="cxt">🎬 Video Ad chính · 15–20 giây · Khóa học Starter</div><div class="cxh">"8 buổi là chơi được Pickleball — học tối T3 & T5 ngay tại Q9 🏓"</div><div class="cxb">HLV dạy thật + học viên cười vui → lịch học cụ thể → "Còn X suất, khai giảng [ngày]". CTA: Nhắn tin. Target: 25–50t, Q9/Thủ Đức, interest cầu lông/tennis/gym.</div></div>
+  <div class="cx"><div class="cxt">📸 Carousel · Dành cho dân social · Rủ nhóm</div><div class="cxh">"Đang chơi cầu lông? Thêm Pickleball — học 1 buổi là mê ngay 🔥"</div><div class="cxb">Slide 1: Hook nhắm dân thể thao. Slide 2: "Chơi vợt rồi học siêu nhanh". Slide 3: Lịch tối. Slide 4: "Rủ 4 người giảm 20%". Retarget người trong group cầu lông Q9.</div></div>
+  <div class="cx"><div class="cxt">🏆 Event Ad · Học thử miễn phí Thứ 7 sáng</div><div class="cxh">"Thứ 7 này học thử Pickleball MIỄN PHÍ tại 625A Đỗ Xuân Hợp 🎯"</div><div class="cxb">Chạy T4–T5 mỗi tuần, boost 200–300k/ngày. Target local 5km. Lead form đơn giản. Mục tiêu 20–30 đăng ký/tuần, 60% thực sự đến.</div></div>
+
+  <div class="hl" style="margin-top:16px">
+    <div class="hlt">📊 KPI Ads phải đạt</div>
+    <div class="g4" style="margin-top:12px">
+      <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--lime);line-height:1">≤435k</div><div style="font-size:0.6rem;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-top:3px">Cost/học viên</div></div>
+      <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--gold);line-height:1">≥1.5%</div><div style="font-size:0.6rem;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-top:3px">CTR tối thiểu</div></div>
+      <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--green);line-height:1">≤50k</div><div style="font-size:0.6rem;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-top:3px">Cost/lead inbox</div></div>
+      <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--red);line-height:1">≥7x</div><div style="font-size:0.6rem;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-top:3px">ROAS mục tiêu</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- S9: KOC -->
+<div class="sec" id="s9">
+  <div class="ey">09 · KOC Mini</div>
+  <div class="st">KOC —<br><em>ƯU TIÊN SPORT PLAYER</em></div>
+  <div class="si">Nhắm KOC đang chơi thể thao, có cộng đồng local Q9/Thủ Đức. Content "hành trình học" viral hơn quảng cáo thông thường 3–5 lần.</div>
+
+  <div class="g3" style="margin-bottom:20px">
+    <div class="koc-card" style="border-left:3px solid var(--green)">
+      <div class="cl">Tier 1 · Ưu tiên cao nhất</div>
+      <div class="ct">Sport KOC · Cầu lông/Tennis</div>
+      <div class="koc-f">5K–30K</div>
+      <div class="koc-fl">followers · đang chơi thể thao vợt tại Q9/Thủ Đức</div>
+      <div class="koc-r"><span style="color:var(--mu)">Số lượng</span><span style="font-weight:600">5–8 người/tháng</span></div>
+      <div class="koc-r"><span style="color:var(--mu)">Chi phí</span><span style="font-weight:600;color:var(--lime)">Free member 1th + 500k</span></div>
+      <div class="koc-r"><span style="color:var(--mu)">Nội dung</span><span style="font-weight:600">Hành trình học từ buổi 1</span></div>
+      <div class="koc-r"><span style="color:var(--mu)">Deliverable</span><span style="font-weight:600">2 Reel + 5 story</span></div>
+    </div>
+    <div class="koc-card" style="border-left:3px solid var(--gold)">
+      <div class="cl">Tier 2 · Micro KOC</div>
+      <div class="ct">Lifestyle · Mẹ Bỉm · Văn phòng</div>
+      <div class="koc-f">20K–100K</div>
+      <div class="koc-fl">followers Facebook/TikTok HCM</div>
+      <div class="koc-r"><span style="color:var(--mu)">Số lượng</span><span style="font-weight:600">2–3 người/tháng</span></div>
+      <div class="koc-r"><span style="color:var(--mu)">Chi phí</span><span style="font-weight:600;color:var(--lime)">2TR–5TR/chiến dịch</span></div>
+      <div class="koc-r"><span style="color:var(--mu)">Nội dung</span><span style="font-weight:600">Review khóa học thật</span></div>
+      <div class="koc-r"><span style="color:var(--mu)">Deliverable</span><span style="font-weight:600">1 video dài + 3 story</span></div>
+    </div>
+    <div class="koc-card" style="border-left:3px solid var(--blue)">
+      <div class="cl">Tier 3 · Seeding</div>
+      <div class="ct">Học viên & Member thật</div>
+      <div class="koc-f">Bất kỳ</div>
+      <div class="koc-fl">social active · hay đăng story thể thao</div>
+      <div class="koc-r"><span style="color:var(--mu)">Số lượng</span><span style="font-weight:600">10–20 người</span></div>
+      <div class="koc-r"><span style="color:var(--mu)">Chi phí</span><span style="font-weight:600;color:var(--lime)">Giảm 20% học phí/member</span></div>
+      <div class="koc-r"><span style="color:var(--mu)">Nội dung</span><span style="font-weight:600">Check-in, story tag sân</span></div>
+      <div class="koc-r"><span style="color:var(--mu)">Deliverable</span><span style="font-weight:600">3–5 story/tuần</span></div>
+    </div>
+  </div>
+
+  <div style="background:var(--card2);border-left:3px solid var(--lime);border-radius:10px;padding:14px 18px;font-size:0.8rem;line-height:1.8;color:var(--mu2)">
+    <div style="font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--lime);margin-bottom:6px">📌 Script DM tiếp cận KOC sport</div>
+    <em>"Chào anh/chị [tên], em thấy anh/chị đang chơi [cầu lông/tennis] tại Q9. Em đang khai trương <strong style="color:var(--text)">Academy Pickleball Global City</strong> tại 625A Đỗ Xuân Hợp — người đã chơi vợt học Pickleball rất nhanh. Em muốn mời anh/chị thử <strong style="color:var(--text)">1 buổi miễn phí</strong> và nếu thấy hay thì hợp tác content nhỏ. Anh/chị có quan tâm không ạ?"</em>
+  </div>
+</div>
+
+<!-- S10: CONTENT -->
+<div class="sec" id="s10">
+  <div class="ey">10 · Lịch content</div>
+  <div class="st">CONTENT —<br><em>5–7 NGÀY/TUẦN</em></div>
+  <div class="si">Tỉ lệ 4:3:3 — giáo dục : cộng đồng : bán hàng. Tập trung HLV dạy thật và hành trình học viên.</div>
+
+  <div class="g2">
+    <div class="card"><div class="cl">Thứ 2 + Thứ 4 · Giáo dục</div><div class="ct">📚 Kỹ thuật Pickleball</div><ul class="li" style="margin-top:8px"><li>Video HLV dạy 1 kỹ thuật: serve, dink, drop shot</li><li>"5 lỗi sai phổ biến người mới hay mắc"</li><li>"Pickleball vs Cầu lông — khác nhau điều gì?"</li><li>Tips chọn vợt, giày cho người mới</li></ul></div>
+    <div class="card"><div class="cl">Thứ 3 + Thứ 6 · Cộng đồng</div><div class="ct">🎥 Hành trình học viên</div><ul class="li" style="margin-top:8px"><li>Before/after: "Buổi 1 vs Buổi 8 của học viên A"</li><li>Clip vui: pha bóng hài hước trong lớp</li><li>"Một buổi tối học Pickleball tại Global City"</li><li>Giới thiệu HLV và phương pháp dạy</li></ul></div>
+    <div class="card"><div class="cl">Thứ 5 + Thứ 7 · Bán hàng</div><div class="ct">💰 Offer & Lịch khai giảng</div><ul class="li" style="margin-top:8px"><li>Lịch khai giảng + còn bao nhiêu suất</li><li>"Học thử miễn phí Thứ 7 sáng — link đăng ký"</li><li>Testimonial video học viên hoàn thành khóa</li><li>"Sau 8 buổi bạn sẽ làm được gì"</li></ul></div>
+    <div class="card"><div class="cl">Chủ Nhật · Engagement</div><div class="ct">🏆 Cộng đồng & Giải trí</div><ul class="li" style="margin-top:8px"><li>Livestream thi đấu giao hữu học viên</li><li>Mini game: "Đoán kỹ thuật này tên gì?"</li><li>Ảnh nhóm lớp học tuần này</li><li>Poll: "Bạn muốn học kỹ thuật gì tiếp?"</li></ul></div>
+  </div>
+</div>
+
+<!-- S11: P&L -->
+<div class="sec" id="s11">
+  <div class="ey">11 · Tài chính thực tế</div>
+  <div class="st">P&L —<br><em>LÃI THỰC SAU CHI PHÍ</em></div>
+  <div class="si">Doanh thu trừ hết: ads, KOC, fanpage, HLV, vận hành sân. Lãi thực còn lại từng tháng.</div>
+
+  <div style="overflow-x:auto;margin-bottom:20px">
+    <table class="tbl">
+      <thead><tr><th>Hạng mục</th><th>T1 · 30TR</th><th>T2 · 80TR</th><th>T3 · 130TR</th><th>T4–5 · 200TR</th></tr></thead>
       <tbody>
-        <tr>
-          <td><strong>Ads 10tr → Học viên</strong></td>
-          <td style="color:var(--green);font-weight:700">20 người</td>
-          <td style="color:var(--gold);font-weight:700">12 người</td>
-          <td style="color:var(--accent);font-weight:700">7 người</td>
-        </tr>
-        <tr>
-          <td><strong>Cost/Student</strong></td>
-          <td style="color:var(--green);font-weight:700">500k</td>
-          <td style="color:var(--gold);font-weight:700">833k</td>
-          <td style="color:var(--accent);font-weight:700">1.43tr</td>
-        </tr>
-        <tr>
-          <td><strong>Doanh thu học phí</strong></td>
-          <td style="color:var(--green);font-weight:700">63tr</td>
-          <td style="color:var(--gold);font-weight:700">37.8tr</td>
-          <td style="color:var(--accent);font-weight:700">22tr</td>
-        </tr>
-        <tr>
-          <td><strong>Sau trừ 15tr marketing</strong></td>
-          <td style="color:var(--green);font-weight:700">48tr</td>
-          <td style="color:var(--gold);font-weight:700">22.8tr</td>
-          <td style="color:var(--accent);font-weight:700">7tr</td>
-        </tr>
-        <tr class="bt-tot">
-          <td><strong>ROAS</strong></td>
-          <td><span class="bamt" style="color:var(--green)">6.3x</span></td>
-          <td><span class="bamt" style="color:var(--gold)">3.8x</span></td>
-          <td><span class="bamt" style="color:var(--accent)">2.2x</span></td>
-        </tr>
+        <tr style="background:rgba(200,240,0,0.03)"><td><strong style="color:var(--lime)">📈 DOANH THU</strong></td><td><span class="pn" style="color:var(--lime)">30TR</span></td><td><span class="pn" style="color:var(--lime)">80TR</span></td><td><span class="pn" style="color:var(--lime)">130TR</span></td><td><span class="pn" style="color:var(--lime)">200TR</span></td></tr>
+        <tr><td style="color:var(--mu2)">— Khóa học 70%</td><td>21TR</td><td>56TR</td><td>91TR</td><td>140TR</td></tr>
+        <tr><td style="color:var(--mu2)">— Member 30%</td><td>9TR</td><td>24TR</td><td>39TR</td><td>60TR</td></tr>
+        <tr style="background:rgba(255,68,34,0.02)"><td><strong style="color:var(--red)">📉 CHI PHÍ MARKETING</strong></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td style="color:var(--mu2)">— Facebook Ads</td><td>10TR</td><td>20TR</td><td>20TR</td><td>20TR</td></tr>
+        <tr><td style="color:var(--mu2)">— Nano KOC</td><td>2TR</td><td>3.5TR</td><td>3.5TR</td><td>3.5TR</td></tr>
+        <tr><td style="color:var(--mu2)">— Vận hành Fanpage</td><td>1.5TR</td><td>1.5TR</td><td>1.5TR</td><td>1.5TR</td></tr>
+        <tr style="background:rgba(255,68,34,0.02)"><td><strong style="color:var(--red)">📉 CHI PHÍ VẬN HÀNH</strong></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td style="color:var(--mu2)">— HLV (chia % lớp + private)</td><td>8TR</td><td>22TR</td><td>30TR</td><td>38TR</td></tr>
+        <tr><td style="color:var(--mu2)">— Điện / nước / bóng / vợt lớp</td><td>5TR</td><td>7TR</td><td>8TR</td><td>10TR</td></tr>
+        <tr><td><strong>TỔNG CHI PHÍ</strong></td><td><span class="pn" style="color:var(--red)">26.5TR</span></td><td><span class="pn" style="color:var(--red)">54TR</span></td><td><span class="pn" style="color:var(--red)">63TR</span></td><td><span class="pn" style="color:var(--red)">73TR</span></td></tr>
+        <tr class="tbl-tot" style="background:rgba(200,240,0,0.04)"><td><strong>💰 LÃI THỰC</strong></td><td><span class="pn" style="color:var(--gold)">+3.5TR</span></td><td><span class="pn" style="color:var(--gold)">+26TR</span></td><td><span class="pn" style="color:var(--green)">+67TR</span></td><td><span class="pn" style="color:var(--lime)">+127TR</span></td></tr>
       </tbody>
     </table>
   </div>
 
-  <div class="hl" style="margin-bottom:32px">
-    <div class="hl-title">⚠️ 3 rủi ro thật cần chuẩn bị</div>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
-      <div class="row"><div class="ri">1️⃣</div><div class="rt"><strong style="color:var(--text)">Tháng 1 thường là kịch bản xấu</strong> — ads chưa tối ưu, creative chưa tìm được winner, pixel chưa học. Đừng kỳ vọng 20 học viên ngay tháng đầu. Mục tiêu thực tế tháng 1: <strong>7–10 học viên</strong>.</div></div>
-      <div class="row"><div class="ri">2️⃣</div><div class="rt"><strong style="color:var(--text)">Chi phí ẩn chưa tính vào</strong> — HLV lương cứng từ tháng 3 (6–8tr), điện/nước, vợt/bóng lớp học, thợ quay content. Lợi nhuận thực tế thấp hơn con số trên.</div></div>
-      <div class="row"><div class="ri">3️⃣</div><div class="rt"><strong style="color:var(--text)">Học thử nhưng không chốt = rò rỉ lớn nhất</strong> — cần đo tỉ lệ inbox → đến thử → chốt. Nếu tỉ lệ chốt tại sân thấp, không phải lỗi ads mà là lỗi chốt sale.</div></div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <div style="flex:1;min-width:200px;background:rgba(200,240,0,0.05);border:1px solid rgba(200,240,0,0.15);border-radius:10px;padding:16px 18px">
+      <div style="font-size:0.6rem;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Khi đạt 200TR/tháng</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--lime);line-height:1">Lãi ~127TR</div>
+      <div style="font-size:0.75rem;color:var(--mu2);margin-top:3px">Biên lợi nhuận ~63.5%</div>
+    </div>
+    <div style="flex:1;min-width:200px;background:rgba(240,176,0,0.05);border:1px solid rgba(240,176,0,0.15);border-radius:10px;padding:16px 18px">
+      <div style="font-size:0.6rem;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Breakeven</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);line-height:1">Tháng 1</div>
+      <div style="font-size:0.75rem;color:var(--mu2);margin-top:3px">Có lãi nhẹ nếu ra đủ lớp đầu</div>
+    </div>
+    <div style="flex:1;min-width:200px;background:rgba(255,68,34,0.05);border:1px solid rgba(255,68,34,0.15);border-radius:10px;padding:16px 18px">
+      <div style="font-size:0.6rem;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Hòa vốn marketing (5 HV/th)</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--red);line-height:1">Rất thấp</div>
+      <div style="font-size:0.75rem;color:var(--mu2);margin-top:3px">Chỉ cần 5 học viên/tháng bù đủ 20TR marketing</div>
     </div>
   </div>
+</div>
 
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;margin-bottom:18px">KPI <em style="color:var(--lime)">THEO DÕI</em></div>
-  <div class="g4" style="margin-bottom:28px">
-    <div class="card al"><div class="c-lbl">Học viên T3</div><div class="c-num">60+</div><div class="c-body">Tổng học viên đang học hoặc đã hoàn thành</div></div>
-    <div class="card ab"><div class="c-lbl">Lớp song song</div><div class="c-num">4–5</div><div class="c-body">Cuối tháng 3. Tháng 1 mục tiêu 1–2 lớp</div></div>
-    <div class="card ag"><div class="c-lbl">Doanh thu T3</div><div class="c-num">25TR</div><div class="c-body">Học phí + Private + Member. Mục tiêu tối thiểu</div></div>
-    <div class="card agr"><div class="c-lbl">Member tự nhiên</div><div class="c-num">30–50</div><div class="c-body">Học viên cũ mua member để duy trì chơi</div></div>
+<!-- S12: TIMELINE -->
+<div class="sec" id="s12">
+  <div class="ey">12 · Kế hoạch thực thi</div>
+  <div class="st">TIMELINE —<br><em>ĐẾN 200TR</em></div>
+  <div class="si">Mỗi giai đoạn có mục tiêu doanh thu rõ ràng. Đừng nhảy bước — build nền tảng đúng thứ tự.</div>
+
+  <div class="tl">
+    <div class="tli">
+      <div><div class="tlw">T1<br>Tuần 1–4</div><div class="tlws">🎯 DT: ~30TR</div></div>
+      <div>
+        <div class="tlt">🏗️ Xây nền — Tuyển HLV · Khai giảng lớp đầu</div>
+        <div class="tags"><span class="tag tgr2">HLV</span><span class="tag tg2">Content</span><span class="tag tl2">Lớp đầu</span><span class="tag tb2">Ads 10TR</span></div>
+        <ul class="li">
+          <li>Tuyển 2 HLV ngay tuần 1 — thử việc demo 1 buổi trước khi ký</li>
+          <li>Thuê thợ quay nửa ngày — 2–3TR, có nguyên liệu content cả tháng</li>
+          <li>Khai giảng 1–2 lớp Starter · mục tiêu 12–16 học viên</li>
+          <li>Học thử miễn phí Thứ 7 sáng đầu tiên — quay toàn bộ làm content</li>
+          <li>Tháng 1 chạy 10TR ads (học tối ưu), giữ 10TR còn lại</li>
+          <li>DM 20–30 KOC sport trong group cầu lông/tennis Q9</li>
+          <li>Nhắn 20 người quen — lớp đầu luôn từ network cá nhân</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tli">
+      <div><div class="tlw">T2<br>Tuần 5–8</div><div class="tlws">🚀 DT: ~80TR</div></div>
+      <div>
+        <div class="tlt">🚀 Tăng tốc — Full 20TR ads · Mở Intermediate · KOC Micro</div>
+        <div class="tags"><span class="tag tl2">Scale</span><span class="tag tr2">Ads 20TR</span><span class="tag tg2">KOC Micro</span><span class="tag tp2">Social</span></div>
+        <ul class="li">
+          <li>Bật full 20TR ads — đã có testimonial thật, creative tốt hơn nhiều</li>
+          <li>Mở Intermediate cho học viên Starter hoàn thành</li>
+          <li>Book 2–3 KOC Micro 20k–100k follow · ngân sách 3–5TR</li>
+          <li>Mini tournament nội bộ lần 1 · livestream · content viral</li>
+          <li>Offer member cho học viên Starter xong: 1 tuần thử free</li>
+          <li>Tiếp cận group chung cư Vinhomes, Masteri Q9</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tli">
+      <div><div class="tlw">T3<br>Tuần 9–12</div><div class="tlws">📈 DT: ~130TR</div></div>
+      <div>
+        <div class="tlt">📈 Ổn định — Mở Advanced · Tuyển HLV 3 · Member 90+</div>
+        <div class="tags"><span class="tag tl2">Advanced</span><span class="tag tgr2">Member 90+</span><span class="tag tg2">HLV 3</span><span class="tag tr2">Tối ưu ads</span></div>
+        <ul class="li">
+          <li>Mở lớp Advanced cho học viên Intermediate hoàn thành</li>
+          <li>Tuyển HLV 3 nếu cần phủ 6+ lớp/tối</li>
+          <li>HLV 1 chuyển lương cứng 8–10TR + 25%</li>
+          <li>Member đạt 90–120 người · referral program chạy tốt</li>
+          <li>Mini tournament tháng 2 — mời khách ngoài vào xem</li>
+          <li>Tối ưu ads: chỉ scale 2–3 creative winner, tắt phần còn lại</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tli">
+      <div><div class="tlw">T4–5<br>Đích đến</div><div class="tlws">🏆 DT: 200TR</div></div>
+      <div>
+        <div class="tlt">🏆 Đạt 200TR — Full capacity · 4 HLV · 165 Member</div>
+        <div class="tags"><span class="tag tl2">200TR</span><span class="tag tgr2">165 Member</span><span class="tag tg2">4 HLV</span><span class="tag tp2">Tournament lớn</span></div>
+        <ul class="li">
+          <li>6 lớp/tối · 3 sân full capacity · 46 học viên mới/tháng</li>
+          <li>165 member active · doanh thu member 60TR/tháng</li>
+          <li>Tuyển HLV 4 nếu cần · hoặc mở thêm ca sáng cuối tuần</li>
+          <li>Giải đấu mở rộng · mời CLB khác Q9/Thủ Đức tham gia</li>
+          <li>Cân nhắc mở rộng: thêm sân, thêm khu vực mới</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S13: KPI -->
+<div class="sec" id="s13">
+  <div class="ey">13 · Đo lường</div>
+  <div class="st">FUNNEL &<br><em>KPI HÀNG TUẦN</em></div>
+  <div class="si">Đo mỗi tuần — không đợi cuối tháng. Thứ 2 review tuần trước, điều chỉnh ngay.</div>
+
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;margin-bottom:16px">FUNNEL <em style="color:var(--lime)">CHUYỂN ĐỔI TUẦN</em></div>
+  <div style="margin-bottom:28px">
+    <div class="funnel-step"><div class="fd"></div><div class="fn">10,000</div><div class="fl">Reach / tuần</div><div class="fs">Ads + organic + KOC story. Q9/Thủ Đức 5km.</div><div class="fa">↓ CTR 1.5% → 150 click</div></div>
+    <div class="funnel-step"><div class="fd" style="background:var(--gold)"></div><div class="fn" style="color:var(--gold)">150</div><div class="fl">Click vào page</div><div class="fs">30% tiếp tục inbox sau khi xem page/video.</div><div class="fa">↓ 30% → 45 inbox</div></div>
+    <div class="funnel-step"><div class="fd" style="background:var(--blue)"></div><div class="fn" style="color:var(--blue)">45</div><div class="fl">Inbox / nhắn tin</div><div class="fs">Hỏi lịch học, giá, địa chỉ. 60% đồng ý đến thử.</div><div class="fa">↓ 60% → 27 đến thử</div></div>
+    <div class="funnel-step"><div class="fd" style="background:var(--purple)"></div><div class="fn" style="color:var(--purple)">27</div><div class="fl">Đến học thử</div><div class="fs">Buổi thử Thứ 7 hoặc tối thường. 40% chốt ngay.</div><div class="fa">↓ 40% → 11 học viên/tuần → ~44/tháng ✅</div></div>
+    <div class="funnel-step" style="border-left-color:transparent"><div class="fd" style="background:var(--red)"></div><div class="fn" style="color:var(--red)">11</div><div class="fl">Học viên mới / tuần</div><div class="fs">~44/tháng. Gần mục tiêu 46. Tỉ lệ chốt tại sân là số quan trọng nhất cần đo từng tuần.</div></div>
+  </div>
+
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;margin-bottom:14px">CHECKLIST <em style="color:var(--lime)">THỨ 2 HÀNG TUẦN</em></div>
+  <div class="g2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="cl">Đo tuần trước</div>
+      <div class="ct">📊 Số cần review</div>
+      <ul class="li" style="margin-top:8px">
+        <li>Học viên mới đăng ký vs tuần trước</li>
+        <li>Tỉ lệ inbox → đến thử (mục tiêu ≥60%)</li>
+        <li>Tỉ lệ đến thử → chốt (mục tiêu ≥40%)</li>
+        <li>CTR và cost/lead từng creative ads</li>
+        <li>Member mới · ai sắp hết hạn cần gia hạn</li>
+        <li>KOC đã đăng chưa · engagement thế nào</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="cl">Cờ đỏ · Xử lý ngay</div>
+      <div class="ct">🚨 Nếu thấy dấu hiệu này</div>
+      <ul class="li" style="margin-top:8px">
+        <li>Cost/lead &gt;80k → đổi creative ngay, không đợi</li>
+        <li>Show-up &lt;40% → vấn đề script inbox, cần đổi</li>
+        <li>Closing &lt;30% → vấn đề trải nghiệm tại sân</li>
+        <li>Lớp &lt;5 người → gộp lớp hoặc delay khai giảng</li>
+        <li>KOC không có engagement → không book lại</li>
+        <li>Member churn cao → review chất lượng sân/HLV</li>
+      </ul>
+    </div>
   </div>
 
   <div class="hl">
-    <div class="hl-title">🎯 3 việc PHẢI làm ngay tuần này</div>
-    <div style="display:flex;flex-direction:column;gap:12px;margin-top:14px">
-      <div class="row"><div class="ri">1️⃣</div><div class="rt"><strong style="color:var(--text)">Đăng tuyển HLV ngay hôm nay</strong> — không có HLV, không có lớp, không có doanh thu. Đây là việc quan trọng nhất.</div></div>
-      <div class="row"><div class="ri">2️⃣</div><div class="rt"><strong style="color:var(--text)">Thuê thợ quay 1 buổi tại sân</strong> — 2–3tr cho nửa ngày. HLV dạy thật, học viên thật. Có nguyên liệu content cả tháng.</div></div>
-      <div class="row"><div class="ri">3️⃣</div><div class="rt"><strong style="color:var(--text)">Nhắn 20 người quen — mời học thử Thứ 7 miễn phí</strong> — lớp đầu tiên luôn từ network. Đừng đợi ads hay page đủ follow.</div></div>
-    </div>
+    <div class="hlt">🎯 3 VIỆC PHẢI LÀM NGAY TUẦN NÀY</div>
+    <div class="row"><div class="ri">1️⃣</div><div class="rt"><em>Đăng tuyển HLV ngay hôm nay</em> — không có HLV, không có lớp, không có gì cả. Đây là việc số 1.</div></div>
+    <div class="row"><div class="ri">2️⃣</div><div class="rt"><em>Thuê thợ quay 1 buổi tại sân</em> — 2–3TR nửa ngày. HLV dạy thật, học viên thật. Nguyên liệu content cả tháng.</div></div>
+    <div class="row"><div class="ri">3️⃣</div><div class="rt"><em>Nhắn 20 người quen — mời học thử Thứ 7 tới miễn phí</em> — lớp đầu luôn từ network. Đừng đợi ads hay page đủ follow.</div></div>
   </div>
 </div>
 
 <div class="footer">
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;margin-bottom:8px">GLOBAL CITY PICKLEBALL <em style="color:var(--lime)">ACADEMY</em></div>
-  625A Đỗ Xuân Hợp, Phước Long, TP.HCM · 0934 492 856<br>
-  Kế hoạch 90 ngày · Academy model · 2025
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;margin-bottom:7px">GLOBAL CITY PICKLEBALL <em style="color:var(--lime)">ACADEMY</em> · MASTER PLAN 2025</div>
+  625A Đỗ Xuân Hợp, Phước Long, Q9, TP.HCM · 📞 0934 492 856 · Mục tiêu 200TR/tháng
 </div>
 
+</div><!-- /content -->
+</div><!-- /layout -->
+
 <script>
-const secs=['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10'];
-const items=document.querySelectorAll('.toc-item');
-function goTo(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});}
-window.addEventListener('scroll',()=>{
+const secs=['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13'];
+const items=document.querySelectorAll('.sb-item');
+
+function go(id){
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+document.getElementById('mainContent').addEventListener('scroll',()=>{
   let cur='s1';
-  secs.forEach(id=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<120)cur=id;});
+  secs.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&el.getBoundingClientRect().top<160)cur=id;
+  });
   items.forEach((it,i)=>it.classList.toggle('active',secs[i]===cur));
 });
 </script>
