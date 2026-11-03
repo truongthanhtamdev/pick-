@@ -632,12 +632,12 @@ const UI={range:'7d',rRange:'30d',posCat:'all',posQ:'',oQ:'',oMethod:'all',oStat
 const cart={lines:new Map(),cust:null,disc:{type:'pct',v:0},note:'',booking:null};
 const BN=['tong-quan','ban-hang','lich-hen','don-hang'];
 const route=()=>{const r=(location.hash||'').replace(/^#\/?/,'');return r==='dat-lich'||ROUTES.some(x=>x.id===r)?r:'tong-quan'};
-const go=id=>{location.hash='#/'+id};
+const go=id=>{location.hash='#'+id};
 
 function renderShell(){
   const r=route();
-  $('#nav').innerHTML=ROUTES.map(x=>`<a href="#/${x.id}" class="${x.id===r?'on':''}" ${x.id===r?'aria-current="page"':''}>${ic(x.icon)}${x.label}<kbd class="kbd" aria-hidden="true">${x.key}</kbd></a>`).join('');
-  $('#bottom-nav').innerHTML=BN.map(id=>{const x=ROUTES.find(y=>y.id===id);return `<a href="#/${id}" class="${id===r?'on':''}">${ic(x.icon,22)}${x.label}</a>`}).join('')+`<button data-act="more-menu" class="${BN.includes(r)?'':'on'}">${ic('more',22)}Thêm</button>`;
+  $('#nav').innerHTML=ROUTES.map(x=>`<a href="#${x.id}" class="${x.id===r?'on':''}" ${x.id===r?'aria-current="page"':''}>${ic(x.icon)}${x.label}<kbd class="kbd" aria-hidden="true">${x.key}</kbd></a>`).join('');
+  $('#bottom-nav').innerHTML=BN.map(id=>{const x=ROUTES.find(y=>y.id===id);return `<a href="#${id}" class="${id===r?'on':''}">${ic(x.icon,22)}${x.label}</a>`}).join('')+`<button data-act="more-menu" class="${BN.includes(r)?'':'on'}">${ic('more',22)}Thêm</button>`;
   document.body.classList.toggle('public',r==='dat-lich');
   $('#page-title').textContent=(ROUTES.find(x=>x.id===r)||{label:'Đặt lịch'}).label;
   $('#brand-mark').innerHTML=ic('bag',20,2.2);
@@ -746,7 +746,7 @@ function vDashboard(){
       <div class="card-b">${chartSlot({type:'bars',h:280,data:series,prev:true,fmt:money,label:'Doanh thu theo thời gian'})}</div>
     </div>
     <div class="card">
-      <div class="card-h"><h3>Bán chạy nhất</h3><div class="right"><a class="link" href="#/bao-cao" style="text-decoration:none;font-size:13px">Xem báo cáo</a></div></div>
+      <div class="card-h"><h3>Bán chạy nhất</h3><div class="right"><a class="link" href="#bao-cao" style="text-decoration:none;font-size:13px">Xem báo cáo</a></div></div>
       <div class="card-b"><div class="list">
         ${top.length?top.map(([id,x],i)=>{const p=prodById(id);return `<div class="list-item"><div class="tile" style="background:${p?p.color:TILE[i]}">${esc(initials(x.n))}</div><div class="grow"><div class="row" style="justify-content:space-between"><span class="cell-main">${esc(x.n)}</span><span class="num" style="font-weight:650">${compact(x.v)}</span></div><div class="cell-sub">${NF.format(x.q)} đã bán</div><div class="bar"><i style="width:${(x.v/topMax*100).toFixed(1)}%"></i></div></div></div>`}).join(''):`<div class="empty">Chưa có dữ liệu</div>`}
       </div></div>
@@ -754,14 +754,14 @@ function vDashboard(){
   </div>
   <div class="dash-grid">
     <div class="card">
-      <div class="card-h"><h3>Đơn gần đây</h3><div class="right"><a class="btn sm" href="#/don-hang" style="text-decoration:none">Tất cả đơn</a></div></div>
+      <div class="card-h"><h3>Đơn gần đây</h3><div class="right"><a class="btn sm" href="#don-hang" style="text-decoration:none">Tất cả đơn</a></div></div>
       <div class="card-b" style="padding:12px 0 0"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Đơn</th><th class="hide-sm">Khách hàng</th><th class="hide-sm">Thanh toán</th><th class="r">Tổng</th></tr></thead><tbody>
       ${recent.map(o=>{const c=custById(o.cust);return `<tr class="click" data-act="order" data-v="${o.id}"><td><div class="cell-main">#${o.no}</div><div class="cell-sub">${ago(o.ts)}</div></td><td class="hide-sm">${c?esc(c.name):'<span class="muted">Khách lẻ</span>'}</td><td class="hide-sm"><span class="row" style="gap:6px;color:var(--text-2)">${ic(METHODS[o.method].icon,16)}${METHODS[o.method].label}</span></td><td class="r num"><div class="cell-main" ${isPaid(o)?'':'style="text-decoration:line-through;color:var(--text-3)"'}>${money(o.total)}</div>${isPaid(o)?'':'<span class="pill red">Đã hoàn</span>'}</td></tr>`}).join('')}
       </tbody></table></div></div>
     </div>
     <div class="stack">
       ${(()=>{const t0=sod(Date.now());const td=S.bookings.filter(b=>b.ts>=t0&&b.ts<t0+DAY&&b.status!=='cancelled');const nx=td.filter(b=>b.status==='booked'&&b.ts>=Date.now()).sort((a,b)=>a.ts-b.ts).slice(0,3);
-      return `<div class="card"><div class="card-h"><h3>Lịch hẹn hôm nay</h3><div class="right"><a class="link" href="#/lich-hen" style="text-decoration:none;font-size:13px">Mở lịch</a></div></div><div class="card-b">
+      return `<div class="card"><div class="card-h"><h3>Lịch hẹn hôm nay</h3><div class="right"><a class="link" href="#lich-hen" style="text-decoration:none;font-size:13px">Mở lịch</a></div></div><div class="card-b">
         <div class="row" style="gap:16px;margin-bottom:${nx.length?'6px':'0'}"><div><b style="font-size:22px" class="num">${td.length}</b> <span class="muted">lịch</span></div><div><b style="font-size:22px;color:var(--green)" class="num">${td.filter(b=>b.status==='done').length}</b> <span class="muted">hoàn tất</span></div></div>
         ${nx.length?`<div class="list">${nx.map(b=>`<button class="list-item" style="width:100%;text-align:left" data-act="booking" data-v="${b.id}"><span class="pill accent num">${fTime(b.ts)}</span><div class="grow"><div class="cell-main">${esc(b.name)}</div><div class="cell-sub">${esc(svcById(b.svc)?.name||'')}</div></div></button>`).join('')}</div>`:'<div class="muted" style="margin-top:6px">Không còn lịch nào sắp tới hôm nay</div>'}
       </div></div>`})()}
@@ -946,7 +946,7 @@ function vOrders(){
   let lastDay=null;
   return `
   <div class="hello"><div><h2>Đơn hàng</h2><p>Hôm nay: ${today.count} đơn · ${money(today.net)}</p></div>
-  <div class="row"><button class="btn" data-act="export-csv" data-v="filtered">${ic('download')}<span class="hide-sm">Xuất CSV</span></button><a class="btn primary" href="#/ban-hang" style="text-decoration:none">${ic('plus')}Tạo đơn</a></div></div>
+  <div class="row"><button class="btn" data-act="export-csv" data-v="filtered">${ic('download')}<span class="hide-sm">Xuất CSV</span></button><a class="btn primary" href="#ban-hang" style="text-decoration:none">${ic('plus')}Tạo đơn</a></div></div>
   <div class="toolbar">
     <div class="input-wrap" style="flex:1;min-width:200px">${ic('search')}<input class="input" id="o-q" placeholder="Mã đơn, tên khách, SĐT, món…" value="${esc(UI.oQ)}" autocomplete="off"></div>
     <select class="select" id="o-m" style="width:auto"><option value="all">Mọi phương thức</option>${Object.entries(METHODS).map(([k,m])=>`<option value="${k}" ${UI.oMethod===k?'selected':''}>${m.label}</option>`).join('')}</select>
@@ -1153,7 +1153,7 @@ function vBookings(){
   const weekAgo=now-30*DAY;const past=S.bookings.filter(b=>b.ts>=weekAgo&&b.ts<now&&b.status!=='cancelled');
   const showRate=past.length?Math.round(past.filter(b=>b.status!=='noshow').length/past.length*100):100;
   const online=S.bookings.filter(b=>b.ts>=weekAgo&&b.src==='online').length;
-  const pubUrl=location.href.split('#')[0]+'#/dat-lich';
+  const pubUrl=location.href.split('#')[0]+'#dat-lich';
   const head=`<div class="tl-head"></div>`+S.staff.map(s=>{const n=active.filter(b=>b.staff===s.id).length;return `<div class="tl-head"><div class="avatar" style="width:26px;height:26px;font-size:10px;background:${s.color}">${esc(initials(s.name))}</div>${esc(s.name)}<span class="pill" style="margin-left:auto">${n}</span></div>`}).join('');
   const hours=`<div class="tl-hours" style="height:${bodyH}px">${Array.from({length:H1-H0},(_,i)=>`<span style="top:${i*PX}px">${H0+i}:00</span>`).join('')}</div>`;
   const cols=S.staff.map(s=>`<div class="tl-col" data-act="slot" data-v="${s.id}" style="height:${bodyH}px" title="Bấm vào chỗ trống để tạo lịch">${showNow?`<div class="tl-now" style="top:${nowTop}px"></div>`:''}${list.filter(b=>b.staff===s.id).sort((a,b)=>a.ts-b.ts).map(b=>{const m=(b.ts-day)/6e4;const top=(m/60-H0)*PX;const h=Math.max(24,b.dur/60*PX-3);const sv=svcById(b.svc);return `<button class="bk st-${b.status}" data-act="booking" data-v="${b.id}" style="top:${top+1}px;height:${h}px;--c:${s.color}"><b>${esc(b.name)}</b><span class="t">${hm(m)}–${hm(m+b.dur)} · ${esc(sv?sv.name:'')}</span>${b.status==='done'?`<span class="ck" style="color:var(--green)">${ic('check',14,2.4)}</span>`:b.src==='online'?`<span class="ck" style="color:var(--text-3)" title="Khách tự đặt online">${ic('link',13)}</span>`:''}</button>`}).join('')}</div>`).join('');
@@ -1174,7 +1174,7 @@ function vBookings(){
       <div class="card"><div class="card-h"><h3>Đặt lịch online</h3></div><div class="card-b stack" style="gap:12px">
         <div class="muted">Gửi link này cho khách (Zalo, Facebook, Google Maps). Khách tự chọn dịch vụ, nhân viên và giờ trống — lịch hiện ngay ở đây.</div>
         <div class="row"><input class="input" readonly value="${esc(pubUrl)}" id="pub-url" style="font-size:12.5px"><button class="btn" data-act="copy-link">${ic('link')}Sao chép</button></div>
-        <a class="btn block" href="#/dat-lich" style="text-decoration:none">Xem trang khách đặt lịch</a>
+        <a class="btn block" href="#dat-lich" style="text-decoration:none">Xem trang khách đặt lịch</a>
       </div></div>
     </div>
   </div>`;
@@ -1268,7 +1268,7 @@ function vPublic(){
     <div class="field span2"><label for="pb-note">Ghi chú (không bắt buộc)</label><textarea class="textarea" id="pb-note" style="min-height:64px">${esc(P.note)}</textarea></div></div>
     <div style="margin-top:16px;padding:14px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)" class="row"><div style="flex:1"><div class="cell-main">${esc(sv.name)}</div><div class="cell-sub">${fTime(P.slot.ts)} · ${fDayLong(P.slot.ts)} · ${esc(staffById(P.slot.staff).name)}</div></div><b class="num">${sv.price?money(sv.price):'Miễn phí'}</b></div>
     <button class="btn primary lg block" style="margin-top:14px" data-act="pb-submit">Xác nhận đặt lịch</button></div>`:''}
-  <div style="text-align:center"><a href="#/lich-hen" class="muted" style="font-size:12.5px">← Trang quản lý (chỉ chủ cửa hàng)</a></div>
+  <div style="text-align:center"><a href="#lich-hen" class="muted" style="font-size:12.5px">← Trang quản lý (chỉ chủ cửa hàng)</a></div>
   </div>`;
 }
 
@@ -1308,7 +1308,7 @@ function openPalette(){
   build();inp.focus();
 }
 function openMoreMenu(){
-  const el=openModal(`<div class="modal-h"><h3>Thêm</h3><button class="icon-btn" data-act="close" aria-label="Đóng">${ic('x')}</button></div><div class="modal-b palette" style="margin:0;max-width:none">${ROUTES.map(r=>r.id).filter(id=>!BN.includes(id)).map(id=>{const r=ROUTES.find(x=>x.id===id);return `<a class="it" href="#/${id}" style="text-decoration:none;color:inherit;padding:14px 10px">${ic(r.icon)}<span style="font-weight:600">${r.label}</span><span class="r">${ic('chevron',16)}</span></a>`}).join('')}<button class="it" data-act="theme" style="padding:14px 10px">${ic('moon')}<span style="font-weight:600">Đổi giao diện sáng / tối</span></button></div>`);
+  const el=openModal(`<div class="modal-h"><h3>Thêm</h3><button class="icon-btn" data-act="close" aria-label="Đóng">${ic('x')}</button></div><div class="modal-b palette" style="margin:0;max-width:none">${ROUTES.map(r=>r.id).filter(id=>!BN.includes(id)).map(id=>{const r=ROUTES.find(x=>x.id===id);return `<a class="it" href="#${id}" style="text-decoration:none;color:inherit;padding:14px 10px">${ic(r.icon)}<span style="font-weight:600">${r.label}</span><span class="r">${ic('chevron',16)}</span></a>`}).join('')}<button class="it" data-act="theme" style="padding:14px 10px">${ic('moon')}<span style="font-weight:600">Đổi giao diện sáng / tối</span></button></div>`);
 }
 
 /* =========================================================
