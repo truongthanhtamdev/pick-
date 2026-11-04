@@ -1,0 +1,10 @@
+# SITE_ADDRESS = tên miền (vd: book.lumi-nails.com.au) → tự có HTTPS miễn phí.
+# Chưa có tên miền thì để ":80" (chạy http qua địa chỉ IP).
+{$SITE_ADDRESS} {
+	encode gzip
+	reverse_proxy app:8080
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Frame-Options "SAMEORIGIN"
+	}
+}

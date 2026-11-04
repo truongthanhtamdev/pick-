@@ -432,6 +432,7 @@ body.public .view{max-width:640px;margin:0 auto;padding:32px 16px 64px}
     <header class="top">
       <h1 id="page-title">Tổng quan</h1>
       <div class="spacer"></div>
+      <span id="sync-pill"></span>
       <button class="searchbtn" data-act="palette" aria-label="Tìm kiếm"><span data-i="search"></span><span>Tìm đơn, dịch vụ, khách…</span><kbd class="kbd">Ctrl K</kbd></button>
       <button class="icon-btn" data-act="theme" aria-label="Đổi giao diện sáng/tối" id="theme-btn-2" style="display:none"></button>
     </header>
@@ -499,8 +500,14 @@ const r2=n=>Math.round((n||0)*100)/100;
 const money=n=>{n=r2(n);const a=Math.abs(n);return (n<0?'−':'')+'$'+a.toLocaleString('en-AU',{minimumFractionDigits:a%1?2:0,maximumFractionDigits:2})};
 const money2=n=>{n=r2(n);return (n<0?'−':'')+'$'+Math.abs(n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})};
 const parseMoney=s=>{const v=parseFloat(String(s??'').replace(/[^\d.]/g,''));return isFinite(v)?r2(v):0};
-const fDayEn=t=>new Date(t).toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'});
-const fTimeEn=t=>new Date(t).toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'});
+const fDayEn=(t,tz)=>new Date(t).toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',...(tz?{timeZone:tz}:{})});
+const fTimeEn=(t,tz)=>new Date(t).toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit',...(tz?{timeZone:tz}:{})});
+const LOCAL_TZ=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone}catch(e){return undefined}})();
+function tzParts(ts,tz){return Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}).formatToParts(new Date(ts)).filter(x=>x.type!=='literal').map(x=>[x.type,+x.value]))}
+function tzOffset(ts,tz){const p=tzParts(ts,tz);return (Date.UTC(p.year,p.month-1,p.day,p.hour,p.minute,p.second)-Math.floor(ts/1000)*1000)/6e4}
+// Thời điểm (ms) của ngày y/m/d, phút thứ `min` theo giờ của tiệm
+function shopTime(y,m,d,min,tz){const base=Date.UTC(y,m,d,0,min);let t=base-tzOffset(base,tz)*6e4;const o2=tzOffset(t,tz);t=base-o2*6e4;return t}
+function shopDay(idx,tz){const p=tzParts(Date.now(),tz);const d=new Date(Date.UTC(p.year,p.month-1,p.day+idx,12));return {y:d.getUTCFullYear(),m:d.getUTCMonth(),d:d.getUTCDate(),wd:d.toLocaleDateString('en-AU',{weekday:'short',timeZone:'UTC'})}}
 const compact=n=>{n=r2(n);const a=Math.abs(n);if(a>=1e6)return '$'+(n/1e6).toFixed(1)+'M';if(a>=1e4)return '$'+Math.round(n/1e3)+'k';if(a>=1e3)return '$'+(n/1e3).toFixed(1).replace('.0','')+'k';return money(n)};
 const DAY=864e5;
 const sod=t=>{const d=new Date(t);d.setHours(0,0,0,0);return d.getTime()};
@@ -634,10 +641,114 @@ const gcNorm=s=>String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
 const gcFind=code=>{const n=gcNorm(code);return n?S.vouchers.find(v=>gcNorm(v.code)===n||gcNorm(v.code)==='GC'+n):null};
 function gcState(v){const now=Date.now();if(v.status==='void')return {k:'void',label:'Đã huỷ',cls:''};if(v.balance<=0)return {k:'used',label:'Đã dùng hết',cls:''};if(v.expires<now)return {k:'expired',label:'Hết hạn',cls:'red'};if(v.balance<v.amount)return {k:'partial',label:'Đang dùng',cls:'amber'};return {k:'new',label:'Chưa dùng',cls:'green'}}
 function gcCardHtml(v,big){return `<div class="gc-card ${big?'big':''}" style="background:${GC_DESIGNS[v.design]||GC_DESIGNS.indigo}">
-  <div class="gc-top"><span>${esc(S.settings.store)}</span><span class="gc-tag">${ic('gift',14,2)}Gift card</span></div>
+  <div class="gc-top"><span>${esc(storeName())}</span><span class="gc-tag">${ic('gift',14,2)}Gift card</span></div>
   <div><div class="gc-amt num">${money(v.amount)}</div>${v.to?`<div class="gc-to">For ${esc(v.to)}</div>`:''}</div>
   <div class="gc-bot"><span class="gc-code">${esc(v.code||'GC-••••-••••')}</span><span>Valid to ${fDateY(v.expires||Date.now()+3*365*DAY)}</span></div></div>`}
-let saveT;function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}},150)}
+let saveT;function save(){if(CLOUD.on){if(CLOUD.loaded)queueSync();return}clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}},150)}
+
+/* =========================================================
+   CLOUD: đồng bộ với máy chủ Quầy (khi app được mở từ VPS)
+   ========================================================= */
+const CLOUD={on:false,loaded:false,token:null,client:'d'+Math.random().toString(36).slice(2,10),rev:0,synced:new Map(),flushT:null,busy:false,status:'ok',pub:null,es:null,viewDirty:false};
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const lsSet=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}};
+async function api(method,path,body){
+  let r;
+  try{r=await fetch(path,{method,cache:'no-store',headers:{'Content-Type':'application/json',...(CLOUD.token?{Authorization:'Bearer '+CLOUD.token}:{})},body:body===undefined?undefined:JSON.stringify(body)})}
+  catch(e){throw Object.assign(new Error('Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.'),{offline:true})}
+  let j={};try{j=await r.json()}catch(e){}
+  if(r.status===401&&!path.startsWith('/api/public')&&path!=='/api/login'){cloudLogout(true);throw new Error('Phiên đăng nhập đã hết, vui lòng đăng nhập lại')}
+  if(!r.ok)throw Object.assign(new Error(j.error||('Lỗi máy chủ ('+r.status+')')),{status:r.status});
+  return j;
+}
+const DOC_COLS=['products','customers','orders','bookings','vouchers'];
+function docsOf(){const m=new Map();m.set('meta/shop',{col:'meta',id:'shop',data:{settings:S.settings,categories:S.categories,staff:S.staff,services:S.services}});for(const c of DOC_COLS)for(const x of (S[c]||[]))m.set(c+'/'+x.id,{col:c,id:x.id,data:x});return m}
+function fromState(st){
+  const meta=(st.meta||[])[0]||{};
+  S={v:3,settings:meta.settings||{},categories:meta.categories||[],staff:meta.staff||[],services:meta.services||[],products:st.products||[],customers:st.customers||[],orders:(st.orders||[]).sort((a,b)=>a.ts-b.ts),bookings:st.bookings||[],vouchers:st.vouchers||[],seq:0};
+  CLOUD.synced=new Map();for(const [k,d] of docsOf())CLOUD.synced.set(k,JSON.stringify(d.data));
+}
+function syncPill(){
+  if(!CLOUD.on)return '<span id="sync-pill" class="pill hide-sm" title="Dữ liệu chỉ lưu trên trình duyệt này. Chạy trên máy chủ để dùng chung nhiều máy.">Bản thử · lưu trên máy</span>';
+  if(!CLOUD.loaded)return '<span id="sync-pill"></span>';
+  const m={ok:['green','Đã đồng bộ'],saving:['amber','Đang lưu…'],offline:['red','Mất kết nối · sẽ tự gửi lại']}[CLOUD.status]||['','…'];
+  return `<span id="sync-pill" class="pill ${m[0]}" title="${m[1]}"><i class="dot" style="background:currentColor"></i><span class="hide-sm">${m[1]}</span></span>`;
+}
+function setSync(st){CLOUD.status=st;const el=$('#sync-pill');if(el)el.outerHTML=syncPill()}
+function queueSync(delay=250){clearTimeout(CLOUD.flushT);CLOUD.flushT=setTimeout(flush,delay)}
+async function flush(){
+  if(!CLOUD.on||!CLOUD.loaded)return;
+  if(CLOUD.busy){queueSync(300);return}
+  const cur=docsOf();const puts=[],dels=[],sent=[];
+  for(const [k,d] of cur){const js=JSON.stringify(d.data);if(CLOUD.synced.get(k)===js)continue;if(d.col==='vouchers'&&CLOUD.synced.has(k))continue;puts.push(d);sent.push([k,js])}
+  for(const k of CLOUD.synced.keys()){if(cur.has(k))continue;const i=k.indexOf('/');const col=k.slice(0,i),id=k.slice(i+1);if(col==='vouchers'||col==='orders')continue;dels.push({col,id})}
+  if(!puts.length&&!dels.length){setSync('ok');return}
+  CLOUD.busy=true;setSync('saving');
+  try{
+    const r=await api('POST','/api/sync',{client:CLOUD.client,puts,dels});
+    for(const [k,js] of sent)CLOUD.synced.set(k,js);
+    for(const d of dels)CLOUD.synced.delete(d.col+'/'+d.id);
+    for(const v of (r.rejected||[]))if(v)applyDoc('vouchers',v.id,v);
+    CLOUD.busy=false;setSync('ok');
+  }catch(e){CLOUD.busy=false;if(CLOUD.token){setSync('offline');queueSync(5000)}}
+}
+function applyDoc(col,id,data){
+  const k=col+'/'+id;
+  if(col==='meta'){if(data){S.settings=data.settings||S.settings;S.categories=data.categories||S.categories;S.staff=data.staff||S.staff;S.services=data.services||S.services}}
+  else if(S[col]){const arr=S[col];const i=arr.findIndex(x=>x.id===id);if(data==null){if(i>=0)arr.splice(i,1)}else if(i>=0)arr[i]=data;else{arr.push(data);if(col==='orders')arr.sort((a,b)=>a.ts-b.ts)}}
+  if(data==null)CLOUD.synced.delete(k);else CLOUD.synced.set(k,JSON.stringify(data));
+}
+function onRemote(msg){
+  if(msg.hello){if(msg.rev>CLOUD.rev)catchUp();return}
+  if(msg.rev)CLOUD.rev=Math.max(CLOUD.rev,msg.rev);
+  if(msg.origin===CLOUD.client)return;
+  for(const d of msg.docs||[])applyDoc(d.col,d.id,d.data);
+  remoteRender();
+}
+async function catchUp(){try{const r=await api('GET','/api/changes?since='+CLOUD.rev);for(const d of r.docs)applyDoc(d.col,d.id,d.data);CLOUD.rev=r.rev;remoteRender()}catch(e){}}
+function remoteRender(){
+  if(!CLOUD.loaded||route()==='dat-lich')return;
+  const a=document.activeElement;
+  if($('#overlay-root').children.length||(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&$('#view').contains(a))){CLOUD.viewDirty=true;return}
+  CLOUD.viewDirty=false;
+  if(route()==='ban-hang')refreshPOS();else render();
+}
+function connectEvents(){
+  if(CLOUD.es)CLOUD.es.close();
+  const es=new EventSource('/api/events?token='+encodeURIComponent(CLOUD.token));CLOUD.es=es;
+  es.onmessage=e=>{try{onRemote(JSON.parse(e.data))}catch(_){}};
+  es.onerror=()=>{if(CLOUD.loaded)setSync('offline')};
+  es.onopen=()=>{queueSync(10)};
+}
+function cloudLogout(expired){
+  lsSet('quay.token',null);CLOUD.token=null;CLOUD.loaded=false;if(CLOUD.es){CLOUD.es.close();CLOUD.es=null}
+  UI.gate='login';UI.gateErr=expired?'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.':'';render();
+}
+async function enterApp(){
+  if(!CLOUD.token){UI.gate='login';render();return}
+  UI.gate='loading';render();
+  try{
+    const st=await api('GET','/api/state');CLOUD.rev=st.rev;
+    if(!(st.meta||[]).length){UI.gate='setup';render();return}
+    fromState(st);CLOUD.loaded=true;UI.gate=null;applyTheme();connectEvents();setSync('ok');render();
+  }catch(e){if(CLOUD.token){UI.gate='login';UI.gateErr=e.message;render()}}
+}
+async function startCloud(data){
+  S=data;CLOUD.synced=new Map();CLOUD.loaded=true;UI.gate=null;
+  render();await flush();connectEvents();render();
+}
+async function loadPub(){try{CLOUD.pub=await api('GET','/api/public')}catch(e){CLOUD.pub={error:e.message,store:'',address:'',phone:'',services:[],staff:[],busy:[],open:9,close:19}}}
+async function gcOp(id,op,extra={}){
+  if(CLOUD.on){const r=await api('POST','/api/gc-op',{id,op,client:CLOUD.client,...extra});applyDoc('vouchers',id,r.voucher);return r.voucher}
+  const v=gcById(id);const now=Date.now();const a=r2(extra.amt||0);
+  if(op==='refund'){v.balance=r2(Math.min(v.amount,v.balance+a));v.log.push({ts:now,type:'refund',amt:a,order:extra.order})}
+  else if(op==='extend'){v.expires=Math.max(v.expires,now)+(extra.days||91)*DAY;v.log.push({ts:now,type:'extend',amt:0})}
+  else if(op==='void'){if(v.status!=='void'){v.log.push({ts:now,type:'void',amt:v.balance,order:extra.order});v.status='void'}}
+  save();return v;
+}
+const paidAmt=o=>r2(o.total-(o.gift?o.gift.amt:0)+(o.tip||0)+(o.surcharge||0));
+const storeName=()=>CLOUD.on&&!CLOUD.loaded&&CLOUD.pub?CLOUD.pub.store:S.settings.store;
+window.addEventListener('beforeunload',e=>{if(CLOUD.on&&CLOUD.loaded&&(CLOUD.busy||CLOUD.status==='offline'||CLOUD.flushT&&CLOUD.status==='saving')){e.preventDefault();e.returnValue=''}});
 S=load();save();
 
 const prodById=id=>S.products.find(p=>p.id===id);
@@ -700,7 +811,8 @@ const ROUTES=[
   {id:'bao-cao',label:'Báo cáo',icon:'chart',key:'8'},
   {id:'cai-dat',label:'Cài đặt',icon:'settings',key:'9'},
 ];
-const UI={range:'7d',rRange:'30d',posCat:'all',posQ:'',oQ:'',oMethod:'all',oStatus:'all',oLimit:40,pQ:'',pCat:'all',cQ:'',cSort:'spent',gQ:'',gF:'all',bDate:sod(Date.now()),pb:{svc:null,staff:'any',day:sod(Date.now()),slot:null,name:'',phone:'',note:'',done:null}};
+const UI_GB={amount:100,design:'rose',to:'',from:'',phone:'',email:'',msg:'',sending:false};
+const UI={range:'7d',rRange:'30d',posCat:'all',posQ:'',oQ:'',oMethod:'all',oStatus:'all',oLimit:40,pQ:'',pCat:'all',cQ:'',cSort:'spent',gQ:'',gF:'all',gb:UI_GB,bDate:sod(Date.now()),pb:{svc:null,staff:'any',day:sod(Date.now()),slot:null,name:'',phone:'',note:'',done:null}};
 const cart={staff:null,lines:new Map(),cust:null,disc:{type:'pct',v:0},note:'',booking:null,gcNew:{},redeem:null};
 const BN=['tong-quan','ban-hang','lich-hen','don-hang'];
 const route=()=>{const r=(location.hash||'').replace(/^#\/?/,'');return r==='dat-lich'||ROUTES.some(x=>x.id===r)?r:'tong-quan'};
@@ -711,6 +823,7 @@ function renderShell(){
   $('#nav').innerHTML=ROUTES.map(x=>`<a href="#${x.id}" class="${x.id===r?'on':''}" ${x.id===r?'aria-current="page"':''}>${ic(x.icon)}${x.label}<kbd class="kbd" aria-hidden="true">${x.key}</kbd></a>`).join('');
   $('#bottom-nav').innerHTML=BN.map(id=>{const x=ROUTES.find(y=>y.id===id);return `<a href="#${id}" class="${id===r?'on':''}">${ic(x.icon,22)}${x.label}</a>`}).join('')+`<button data-act="more-menu" class="${BN.includes(r)?'':'on'}">${ic('more',22)}Thêm</button>`;
   document.body.classList.toggle('public',r==='dat-lich');
+  {const sp=$('#sync-pill');if(sp)sp.outerHTML=syncPill()}
   $('#page-title').textContent=(ROUTES.find(x=>x.id===r)||{label:'Đặt lịch'}).label;
   $('#brand-mark').innerHTML=ic('polish',20,2);
   $('#side-store').textContent=S.settings.store;
@@ -724,6 +837,12 @@ function renderShell(){
 function render(){
   renderShell();
   const r=route();const v=$('#view');
+  if(CLOUD.on&&r==='dat-lich'&&!CLOUD.pub){v.innerHTML='<div class="empty">Loading…</div>';loadPub().then(render);return}
+  if(CLOUD.on&&r!=='dat-lich'&&!CLOUD.loaded){
+    if(!UI.gate){UI.gate='loading';enterApp();}
+    document.body.classList.add('public');v.classList.remove('full');
+    v.innerHTML=vGate();hydrateIcons(v);const pw=$('#lg-pw');if(pw)pw.focus();return;
+  }
   v.classList.toggle('full',r==='ban-hang');
   v.innerHTML=VIEWS[r]();
   hydrateIcons(v);
@@ -780,6 +899,24 @@ document.addEventListener('mousemove',e=>{
   if(x+w>innerWidth-8)x=e.clientX-w-14;if(y<8)y=e.clientY+16;
   tip.style.left=x+'px';tip.style.top=y+'px';
 });
+
+/* =========================================================
+   GATE: đăng nhập / khởi tạo (chế độ máy chủ)
+   ========================================================= */
+function vGate(){
+  const head=`<div class="pub-head"><div class="brand-mark">${ic('polish',24,2)}</div><div><h2>Quầy</h2><div class="muted">Quản lý tiệm nail</div></div></div>`;
+  if(UI.gate==='loading')return head+'<div class="card card-b"><div class="empty">Đang tải dữ liệu…</div></div>';
+  if(UI.gate==='setup')return head+`<div class="card card-b stack"><h3 style="margin:0">Bắt đầu sử dụng</h3><p class="muted" style="margin:0">Máy chủ chưa có dữ liệu. Chọn một cách để bắt đầu (làm một lần duy nhất).</p>
+    <button class="svc" data-act="setup-empty"><div class="tile" style="background:var(--accent)">${ic('plus',18,2)}</div><div class="grow"><div class="cell-main">Bắt đầu cho tiệm thật</div><div class="cell-sub">Có sẵn danh sách dịch vụ nail và 4 thợ mẫu để sửa lại. Chưa có đơn, khách, lịch.</div></div></button>
+    <button class="svc" data-act="setup-demo"><div class="tile" style="background:var(--text-3)">${ic('chart',18,2)}</div><div class="grow"><div class="cell-main">Dùng dữ liệu mẫu để thử</div><div class="cell-sub">70 ngày đơn hàng, khách, lịch hẹn, thẻ quà tặng giả lập. Xoá được trong Cài đặt.</div></div></button></div>`;
+  return head+`<div class="card card-b"><h3 style="margin:0 0 6px">Đăng nhập tiệm</h3><p class="muted" style="margin:0 0 16px">Nhập mật khẩu tiệm (đặt trong file .env trên máy chủ). Mỗi máy chỉ cần đăng nhập một lần.</p>
+    <form id="login-f" class="stack" style="gap:12px"><div class="field"><label for="lg-pw">Mật khẩu</label><input class="input" type="password" id="lg-pw" autocomplete="current-password" required></div>
+    <div class="field"><label for="lg-dev">Tên máy này</label><input class="input" id="lg-dev" placeholder="VD: iPad quầy, điện thoại chủ tiệm" value="${esc(lsGet('quay.device')||'')}"></div>
+    ${UI.gateErr?`<div class="alert-row" style="background:var(--red-soft);color:var(--red)">${ic('alert',16)}${esc(UI.gateErr)}</div>`:''}
+    <button class="btn primary lg block" type="submit">Đăng nhập</button></form>
+    <div style="text-align:center;margin-top:14px"><a href="#dat-lich" class="muted" style="font-size:12.5px">Trang đặt lịch cho khách →</a></div></div>`;
+}
+function emptyShop(){const d=seed();d.orders=[];d.customers=[];d.bookings=[];d.vouchers=[];d.seq=1001;return d}
 
 /* =========================================================
    VIEW: DASHBOARD
@@ -917,7 +1054,7 @@ function addToCart(pid){const p=lineInfo(pid);if(!p)return;const q=cart.lines.ge
 
 function openCheckout(){
   const T=cartTotals();if(!T.qty)return;
-  const st={method:'card',given:0,tip:0,done:null};const due=()=>r2(T.due+st.tip);
+  const st={method:'card',given:0,tip:0,done:null};const sur=()=>st.method==='card'&&T.due?r2((T.due+st.tip)*(+S.settings.surcharge||0)/100):0;const due=()=>r2(T.due+st.tip+sur());
   const quick=()=>{const t=due();const set=new Set([t]);for(const u of [5,10,20,50,100]){const v=Math.ceil(t/u)*u;if(v>t)set.add(v)}return [...set].sort((a,b)=>a-b).slice(0,4)};
   const body=()=>{
     if(st.done)return receiptView(st.done,true);
@@ -927,7 +1064,7 @@ function openCheckout(){
     <div class="modal-f"><button class="btn" data-act="close">Huỷ</button><button class="btn primary" id="pay-ok">${ic('check')}Xác nhận</button></div>`;
     return `<div class="modal-h"><h3>Thanh toán</h3><button class="icon-btn" data-act="close" aria-label="Đóng">${ic('x')}</button></div>
     <div class="modal-b">
-      <div class="due"><div class="lbl">Khách cần trả</div><div class="amt num">${money2(due())}</div><div class="muted">${T.qty} dịch vụ${cart.cust?' · '+esc(custById(cart.cust).name):''}${T.redeem?' · đã trừ thẻ quà tặng '+money(T.redeem):''}${st.tip?' · gồm tip '+money(st.tip):''}</div></div>
+      <div class="due"><div class="lbl">Khách cần trả</div><div class="amt num">${money2(due())}</div><div class="muted">${T.qty} dịch vụ${cart.cust?' · '+esc(custById(cart.cust).name):''}${T.redeem?' · đã trừ thẻ quà tặng '+money(T.redeem):''}${st.tip?' · gồm tip '+money(st.tip):''}${sur()?' · gồm phụ phí thẻ '+money2(sur()):''}</div></div>
       <div class="field" style="margin-bottom:16px"><label>Tip cho thợ${sf?' '+esc(sf.name):''} <span class="muted" style="font-weight:500">(không tính vào doanh thu)</span></label><div class="quick" style="grid-template-columns:repeat(5,1fr);margin-top:0">${[0,5,10,15,20].map(x=>`<button class="btn sm ${st.tip===x?'primary':''}" data-tip="${x}">${x?money(x):'Không'}</button>`).join('')}</div></div>
       <div class="pay-methods">${Object.entries(METHODS).filter(([k])=>PAY_METHODS.includes(k)).map(([k,x])=>`<button class="pm ${m===k?'on':''}" data-pm="${k}">${ic(x.icon,22)}${x.label}</button>`).join('')}</div>
       ${m==='cash'?`<div class="field"><label for="given">Tiền khách đưa ($)</label><input class="input num" id="given" inputmode="decimal" placeholder="0.00" value="${st.given||''}" style="height:48px;font-size:18px;font-weight:650"></div>
@@ -945,18 +1082,22 @@ function openCheckout(){
     el.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{st.given=+b.dataset.q;rerender()});
     el.querySelectorAll('[data-tip]').forEach(b=>b.onclick=()=>{st.tip=+b.dataset.tip;rerender()});
     const g=$('#given',el);if(g){g.oninput=()=>{const v=parseMoney(g.value);st.given=v;const ch=$('#change',el);const c=r2(v-due());ch.style.display=v?'':'none';ch.className='change'+(c<0?' neg':'');ch.innerHTML=`<span>${c<0?'Còn thiếu':'Tiền thối lại'}</span><span class="num">${money2(Math.abs(c))}</span>`;$('#pay-ok',el).disabled=v>0&&v<due()};setTimeout(()=>g.focus(),50);g.onkeydown=e=>{if(e.key==='Enter'&&!$('#pay-ok',el).disabled)$('#pay-ok',el).click()}}
-    const ok=$('#pay-ok',el);if(ok)ok.onclick=()=>{if(!cart.staff&&S.staff.length){toast('Chọn thợ làm cho đơn này trước','alert');return}st.done=completeSale(T.due?st.method:'gift',st.method==='cash'&&T.due?(st.given||due()):due(),st.tip);rerender()};
+    const ok=$('#pay-ok',el);if(ok)ok.onclick=async()=>{if(!cart.staff&&S.staff.length){toast('Chọn thợ làm cho đơn này trước','alert');return}
+      ok.disabled=true;const method=T.due?st.method:'gift';const oid=uid();let no=null;
+      try{if(CLOUD.on){no=(await api('POST','/api/next-no')).no;if(T.redeem){const r=await api('POST','/api/gc-op',{id:cart.redeem,op:'redeem',amt:T.redeem,order:oid,client:CLOUD.client});applyDoc('vouchers',r.voucher.id,r.voucher)}}}
+      catch(e){ok.disabled=false;toast(e.message,'alert');if(e.status===409){cart.redeem=null;closeOverlay();refreshPOS()}return}
+      st.done=completeSale(method,st.method==='cash'&&T.due?(st.given||due()):due(),st.tip,{oid,no,redeemDone:CLOUD.on,surcharge:sur()});rerender()};
   }
   bind();
 }
-function completeSale(method,given,tip=0){
+function completeSale(method,given,tip=0,opts={}){
   const T=cartTotals();
-  const now=Date.now();const oid=uid();const sold=[];
+  const now=Date.now();const oid=opts.oid||uid();const sold=[];
   const items=[...cart.lines].map(([pid,q])=>{const p=lineInfo(pid);if(!p)return null;
     if(p.gc){const g=cart.gcNew[pid];const v={id:'g'+uid(),code:gcCode(),amount:g.amount,balance:g.amount,cust:cart.cust,to:g.to,msg:g.msg,design:g.design,created:now,expires:now+Math.max(36,+S.settings.gcMonths||36)*30.44*DAY,status:'active',order:oid,log:[{ts:now,type:'issue',amt:g.amount,order:oid}]};S.vouchers.push(v);sold.push(v.id);return {p:'gc:'+v.id,n:'Thẻ quà tặng '+v.code,q:1,pr:g.amount,c:0}}
     if(tracks(p))p.stock=Math.max(0,p.stock-q);return {p:pid,n:p.name,q,pr:p.price,c:p.cost,s:p.service?1:0}}).filter(Boolean);
-  const o={id:oid,no:S.seq++,ts:now,items,sub:T.sub,disc:T.disc,tax:T.tax,total:T.total,method,cust:cart.cust,staff:cart.staff,tip,status:'paid',note:cart.note,given,gcSold:T.gc,soldVouchers:sold};
-  if(T.redeem){const v=gcById(cart.redeem);v.balance-=T.redeem;v.log.push({ts:now,type:'redeem',amt:T.redeem,order:oid});o.gift={vid:v.id,code:v.code,amt:T.redeem}}
+  const o={id:oid,no:opts.no||S.seq++,ts:now,surcharge:opts.surcharge||0,items,sub:T.sub,disc:T.disc,tax:T.tax,total:T.total,method,cust:cart.cust,staff:cart.staff,tip,status:'paid',note:cart.note,given,gcSold:T.gc,soldVouchers:sold};
+  if(T.redeem){const v=gcById(cart.redeem);if(!opts.redeemDone){v.balance=r2(v.balance-T.redeem);v.log.push({ts:now,type:'redeem',amt:T.redeem,order:oid})}o.gift={vid:v.id,code:v.code,amt:T.redeem}}
   S.orders.push(o);
   if(cart.booking){const b=S.bookings.find(x=>x.id===cart.booking);if(b){b.status='done';b.order=o.id}}
   save();
@@ -966,7 +1107,7 @@ function completeSale(method,given,tip=0){
 }
 function receiptView(o,fresh){
   const c=custById(o.cust);
-  return `${fresh?`<div class="modal-h"><div style="flex:1"></div><button class="icon-btn" data-act="close" aria-label="Đóng">${ic('x')}</button></div><div class="modal-b" style="padding-top:0"><div class="success"><div class="ring">${ic('check',36,2.4)}</div><h3 style="margin:0;font-size:20px">Thanh toán thành công</h3><div class="muted">Đơn #${o.no} · ${METHODS[o.method].label}${o.method==='cash'&&o.given>(o.total-(o.gift?o.gift.amt:0)+(o.tip||0))?' · Thối lại '+money2(o.given-(o.total-(o.gift?o.gift.amt:0)+(o.tip||0))):''}${o.tip?' · Tip '+money(o.tip):''}</div></div>
+  return `${fresh?`<div class="modal-h"><div style="flex:1"></div><button class="icon-btn" data-act="close" aria-label="Đóng">${ic('x')}</button></div><div class="modal-b" style="padding-top:0"><div class="success"><div class="ring">${ic('check',36,2.4)}</div><h3 style="margin:0;font-size:20px">Thanh toán thành công</h3><div class="muted">Đơn #${o.no} · ${METHODS[o.method].label}${o.method==='cash'&&o.given>paidAmt(o)?' · Thối lại '+money2(o.given-paidAmt(o)):''}${o.tip?' · Tip '+money(o.tip):''}</div></div>
   ${(o.soldVouchers||[]).map(id=>{const v=gcById(id);return v?`<div style="margin-top:14px">${gcCardHtml(v)}<div class="row" style="margin-top:8px"><button class="btn sm" data-act="gc-copy-msg" data-v="${v.id}">${ic('copy',15)}Sao chép tin nhắn gửi khách</button><button class="btn sm ghost" data-act="gc-open" data-v="${v.id}">Xem thẻ</button></div></div>`:''}).join('')}`:'<div>'}
   <div class="receipt" id="print-area">
     <div class="c" style="font-weight:700;font-size:14px">${esc(S.settings.store)}</div>
@@ -980,9 +1121,10 @@ function receiptView(o,fresh){
     <div class="r" style="font-weight:700;font-size:14px"><span>TOTAL</span><span>${money2(o.total)}</span></div>
     <div class="r"><span>Includes GST</span><span>${money2((o.total-(o.gcSold||0))/11)}</span></div>
     ${o.gift?`<div class="r"><span>Gift card ${esc(o.gift.code)}</span><span>${money2(o.gift.amt)}</span></div>`:''}
-    ${o.method!=='gift'?`<div class="r"><span>${METHODS[o.method].en}</span><span>${money2(o.given||(o.total-(o.gift?o.gift.amt:0)+(o.tip||0)))}</span></div>`:''}
+    ${o.method!=='gift'?`<div class="r"><span>${METHODS[o.method].en}</span><span>${money2(o.given||paidAmt(o))}</span></div>`:''}
+    ${o.surcharge?`<div class="r"><span>Card surcharge</span><span>${money2(o.surcharge)}</span></div>`:''}
     ${o.tip?`<div class="r"><span>Tip${staffById(o.staff)?' for '+esc(staffById(o.staff).name):''}</span><span>${money2(o.tip)}</span></div>`:''}
-    ${o.method==='cash'&&o.given>(o.total-(o.gift?o.gift.amt:0)+(o.tip||0))?`<div class="r"><span>Change</span><span>${money2(o.given-(o.total-(o.gift?o.gift.amt:0)+(o.tip||0)))}</span></div>`:''}
+    ${o.method==='cash'&&o.given>paidAmt(o)?`<div class="r"><span>Change</span><span>${money2(o.given-paidAmt(o))}</span></div>`:''}
     ${o.status!=='paid'?'<div class="c" style="font-weight:700;margin-top:6px">*** REFUNDED ***</div>':''}
     <hr><div class="c">Thank you, see you again soon! 💅</div>
   </div></div>
@@ -1219,6 +1361,21 @@ function vReports(){
 /* =========================================================
    VIEW: SETTINGS
    ========================================================= */
+function serverCard(){
+  if(!CLOUD.on)return `<div class="card"><div class="card-h"><h3>Máy chủ</h3><div class="right"><span class="pill">Bản thử</span></div></div><div class="card-b muted">App đang chạy ở chế độ thử, dữ liệu chỉ lưu trên trình duyệt này. Cài máy chủ Quầy trên VPS (xem quay-server/HUONG-DAN.md) để mọi máy dùng chung dữ liệu, nhận lịch đặt online, gửi SMS và bán thẻ quà tặng online.</div></div>`;
+  if(!UI.srv&&!UI.srvLoading){UI.srvLoading=true;api('GET','/api/status').then(r=>{UI.srv=r;UI.srvLoading=false;if(route()==='cai-dat')render()},()=>{UI.srvLoading=false})}
+  const r=UI.srv;const on=(x,l)=>`<span class="pill ${x?'green':''}">${x?ic('check',12,2.4)+l:'Chưa bật'}</span>`;
+  const pub=location.origin+location.pathname+'#dat-lich';
+  return `<div class="card"><div class="card-h"><h3>Máy chủ</h3><div class="right">${syncPill()}</div></div><div class="card-b stack" style="gap:12px">
+    <div class="row"><span style="flex:1;color:var(--text-2)">SMS xác nhận & nhắc lịch</span>${r?on(r.sms,r.sms==='clicksend'?'ClickSend':'Twilio'):'…'}</div>
+    <div class="row"><span style="flex:1;color:var(--text-2)">Bán thẻ quà tặng online (Stripe)</span>${r?on(r.stripe,'Đã bật'):'…'}</div>
+    <div class="row"><span style="flex:1;color:var(--text-2)">Sao lưu gần nhất</span><span class="muted num">${r&&r.backups.length?esc(r.backups[r.backups.length-1].replace('quay-','').replace('.db','')):'…'}</span></div>
+    <div class="field"><label for="pub-link">Link đặt lịch cho khách</label><div class="row"><input class="input" id="pub-link" readonly value="${esc(pub)}"><button class="btn" data-act="copy-pub">${ic('copy',15)}Chép</button></div></div>
+    ${r&&r.sms?`<div class="field"><label for="sms-ph">Gửi SMS thử</label><div class="row"><input class="input" id="sms-ph" inputmode="tel" placeholder="04xx xxx xxx"><button class="btn" data-act="sms-test">Gửi</button></div></div>
+      ${r.smsLog.length?`<div class="list">${r.smsLog.slice(0,5).map(l=>`<div class="list-item"><div class="grow"><div class="cell-main">${esc(l.to)} ${l.ok?'':'<span class="pill red">Lỗi</span>'}</div><div class="cell-sub">${fDT(l.ts)} · ${esc(l.ok?l.body.slice(0,70):l.error||'')}</div></div></div>`).join('')}</div>`:''}`:''}
+    <div class="row" style="flex-wrap:wrap"><button class="btn" data-act="logout">Đăng xuất máy này</button><button class="btn danger" data-act="logout-all">Đăng xuất mọi máy</button></div>
+  </div></div>`;
+}
 function vSettings(){
   const s=S.settings;
   const kb=(k,d)=>`<div class="row" style="justify-content:space-between;padding:6px 0"><span style="color:var(--text-2)">${d}</span><kbd class="kbd">${k}</kbd></div>`;
@@ -1231,18 +1388,30 @@ function vSettings(){
         <div class="field"><label for="s-phone">Số điện thoại</label><input class="input" id="s-phone" data-set="phone" value="${esc(s.phone)}"></div>
         <div class="field"><label for="s-abn">ABN</label><input class="input num" id="s-abn" data-set="abn" value="${esc(s.abn||'')}" placeholder="12 345 678 901"><span class="hint">In trên hoá đơn (Tax invoice)</span></div>
         <div class="field span2"><label for="s-bank">PayID nhận chuyển khoản</label><input class="input" id="s-bank" data-set="bank" value="${esc(s.bank||'')}" placeholder="PayID: 04xx xxx xxx (Tên tài khoản)"><span class="hint">Hiện khi khách chọn trả bằng PayID. Giá dịch vụ đã gồm GST 10%; hoá đơn tự tách tiền GST.</span></div>
+        <div class="field"><label for="s-sur">Phụ phí thẻ (%)</label><input class="input num" id="s-sur" data-set="surcharge" type="number" min="0" max="5" step="0.1" value="${s.surcharge||0}"><span class="hint">Cộng thêm khi khách trả bằng thẻ. Phải báo khách trước; để 0 nếu không thu.</span></div>
         <div class="field"><label for="s-com">Hoa hồng thợ (%)</label><input class="input num" id="s-com" data-set="commission" type="number" min="0" max="100" value="${s.commission??40}"><span class="hint">Tính trên doanh thu dịch vụ</span></div>
         <div class="field"><label for="s-gcm">Hạn dùng thẻ quà tặng (tháng)</label><input class="input num" id="s-gcm" data-set="gcMonths" type="number" min="36" max="120" value="${s.gcMonths||36}"><span class="hint">Luật Úc: tối thiểu 3 năm (36 tháng)</span></div>
+      </div></div>
+      <div class="card"><div class="card-h"><h3>Thợ & giờ làm</h3><div class="right"><button class="btn sm" data-act="staff-add">${ic('plus',15)}Thêm thợ</button></div></div><div class="card-b stack" style="gap:10px">
+        ${S.staff.map(x=>`<div class="row"><div class="avatar" style="width:30px;height:30px;font-size:11px;background:${x.color}">${esc(initials(x.name))}</div><input class="input" id="st-${x.id}" data-staff="${x.id}" value="${esc(x.name)}" aria-label="Tên thợ"><button class="icon-btn sm" data-act="staff-del" data-v="${x.id}" aria-label="Xoá thợ ${esc(x.name)}">${ic('trash',15)}</button></div>`).join('')}
+        <div class="form-grid" style="margin-top:6px">
+          <div class="field"><label for="s-open">Mở cửa (giờ)</label><input class="input num" id="s-open" data-set="openHour" type="number" min="5" max="12" value="${s.openHour||9}"></div>
+          <div class="field"><label for="s-close">Đóng cửa (giờ)</label><input class="input num" id="s-close" data-set="closeHour" type="number" min="13" max="23" value="${s.closeHour||19}"></div>
+        </div><span class="hint muted" style="font-size:12px">Dùng cho lịch hẹn và giờ khách được đặt online.</span></div></div>
+      <div class="card"><div class="card-h"><h3>Dịch vụ cho khách đặt online</h3><div class="right"><button class="btn sm" data-act="svc-add">${ic('plus',15)}Thêm</button></div></div><div class="card-b stack" style="gap:8px">
+        <div class="row muted" style="font-size:12px"><span style="flex:1">Tên (tiếng Anh)</span><span style="width:74px">Phút</span><span style="width:84px">Giá ($)</span><span style="width:30px"></span></div>
+        ${S.services.map(x=>`<div class="row"><input class="input" id="sv-n-${x.id}" data-svc="${x.id}" data-f="name" value="${esc(x.name)}" aria-label="Tên dịch vụ"><input class="input num" style="width:74px" id="sv-d-${x.id}" data-svc="${x.id}" data-f="dur" type="number" min="15" step="15" value="${x.dur}" aria-label="Thời lượng"><input class="input num" style="width:84px" id="sv-p-${x.id}" data-svc="${x.id}" data-f="price" inputmode="decimal" value="${x.price}" aria-label="Giá"><button class="icon-btn sm" data-act="svc-del" data-v="${x.id}" aria-label="Xoá">${ic('trash',15)}</button></div>`).join('')}
       </div></div>
       <div class="card"><div class="card-h"><h3>Giao diện</h3></div><div class="card-b"><div class="seg">${[['auto','Theo hệ thống'],['light','Sáng'],['dark','Tối']].map(([k,v])=>`<button data-act="set-theme" data-v="${k}" class="${s.theme===k?'on':''}">${v}</button>`).join('')}</div></div></div>
     </div>
     <div class="stack">
+      ${serverCard()}
       <div class="card"><div class="card-h"><h3>Phím tắt</h3></div><div class="card-b">${kb('Ctrl K','Tìm kiếm nhanh')}${kb('1 – 9','Chuyển trang')}${kb('/','Tìm món (trang Bán hàng)')}${kb('Esc','Đóng cửa sổ')}</div></div>
       <div class="card"><div class="card-h"><h3>Dữ liệu</h3></div><div class="card-b stack" style="gap:10px">
-        <div class="muted">Dữ liệu lưu trên trình duyệt này (${NF.format(S.orders.length)} đơn, ${S.products.length} món, ${S.customers.length} khách).</div>
+        <div class="muted">${CLOUD.on?'Dữ liệu lưu trên máy chủ, sao lưu tự động mỗi ngày':'Dữ liệu lưu trên trình duyệt này'} (${NF.format(S.orders.length)} đơn, ${S.products.length} món, ${S.customers.length} khách).</div>
         <button class="btn" data-act="export-json">${ic('download')}Sao lưu (JSON)</button>
         <button class="btn" data-act="reset-demo">${ic('refund')}Tạo lại dữ liệu mẫu</button>
-        <button class="btn danger" data-act="clear-all">${ic('trash')}Xoá toàn bộ đơn & khách</button>
+        <button class="btn danger" data-act="clear-all">${ic('trash')}Xoá toàn bộ dữ liệu bán hàng</button>
       </div></div>
     </div>
   </div>`;
@@ -1250,7 +1419,7 @@ function vSettings(){
 /* =========================================================
    VIEW: BOOKINGS (admin)
    ========================================================= */
-const TL={H0:9,H1:19,PX:64};
+const TL={get H0(){return +(S&&S.settings&&S.settings.openHour)||9},get H1(){return +(S&&S.settings&&S.settings.closeHour)||19},PX:64};
 function vBookings(){
   const day=UI.bDate,end=day+DAY,now=Date.now(),t0=sod(now);
   const list=S.bookings.filter(b=>b.ts>=day&&b.ts<end);
@@ -1310,6 +1479,7 @@ function openBooking(id){
     ${b.note?`<div style="padding:12px;border-radius:12px;background:var(--amber-soft);color:var(--amber)">${esc(b.note)}</div>`:''}
     ${c?`<button class="cart-cust set" style="margin:0;width:100%" data-act="customer" data-v="${c.id}"><div class="avatar" style="background:${avColor(c.id)}">${esc(initials(c.name))}</div><div style="flex:1;text-align:left"><div class="cell-main">${esc(c.name)}</div><div class="cell-sub">Xem hồ sơ khách</div></div>${ic('chevron',16)}</button>`:''}
     ${b.order?`<button class="btn" data-act="order" data-v="${b.order}">${ic('receipt')}Xem hoá đơn</button>`:''}
+    ${CLOUD.on&&b.phone&&b.status==='booked'?`<button class="btn" data-act="b-sms" data-v="${b.id}">${ic('note')}Gửi SMS xác nhận${b.reminded>0?' (đã nhắc '+fDT(b.reminded)+')':''}</button>`:''}
     <div class="row" style="flex-wrap:wrap">${actions}</div>
     <div class="row" style="border-top:1px solid var(--line);padding-top:14px"><button class="btn ghost" data-act="booking-edit" data-v="${b.id}">${ic('edit')}Sửa / dời lịch</button><div style="flex:1"></div><button class="btn ghost danger" data-act="b-del" data-v="${b.id}">${ic('trash')}Xoá</button></div>
   </div>`);
@@ -1352,34 +1522,72 @@ function openBookingForm(id,pre={}){
 /* =========================================================
    VIEW: PUBLIC BOOKING PAGE (khách tự đặt)
    ========================================================= */
-function freeSlots(day,sv,staffSel){
-  const out=[];const now=Date.now();const staff=staffSel==='any'?S.staff:S.staff.filter(s=>s.id===staffSel);
-  for(let m=TL.H0*60;m+sv.dur<=TL.H1*60;m+=30){const ts=day+m*6e4;if(ts<now+30*6e4)continue;const s=staff.find(s=>!S.bookings.some(b=>b.staff===s.id&&overlaps(b,ts,sv.dur)));if(s)out.push({ts,m,staff:s.id})}
+function PD(){
+  if(CLOUD.on)return CLOUD.pub||{store:'',address:'',phone:'',services:[],staff:[],busy:[],open:9,close:19};
+  return {store:S.settings.store,address:S.settings.address,phone:S.settings.phone,services:S.services,staff:S.staff,busy:S.bookings.filter(b=>b.status!=='cancelled'),open:TL.H0,close:TL.H1,tz:LOCAL_TZ,stripe:false,gcAmounts:[50,80,100,150,200]};
+}
+function freeSlots(dp,sv,staffSel,D=PD()){
+  const out=[];const now=Date.now();const staff=staffSel==='any'?D.staff:D.staff.filter(s=>s.id===staffSel);
+  const busy=(D.busy||[]).filter(b=>b.status!=='cancelled');
+  for(let m=D.open*60;m+sv.dur<=D.close*60;m+=30){const ts=shopTime(dp.y,dp.m,dp.d,m,D.tz||LOCAL_TZ);if(ts<now+30*6e4)continue;const s=staff.find(s=>!busy.some(b=>b.staff===s.id&&b.ts<ts+sv.dur*6e4&&b.ts+b.dur*6e4>ts));if(s)out.push({ts,m,staff:s.id})}
   return out;
 }
+let giftPolls=0;
+async function pollGift(){
+  try{const r=await api('GET','/api/public/gift-session?sid='+encodeURIComponent(UI.pb.giftSid));if(r.card){UI.pb.giftCard=r.card;history.replaceState(null,'',location.pathname+location.hash);render();return}}catch(e){UI.pb.giftErr=e.message;render();return}
+  if(++giftPolls<40)setTimeout(pollGift,2000);else{UI.pb.giftErr='Payment is still processing. Your gift card code will be sent by SMS shortly.';render()}
+}
 function vPublic(){
-  const P=UI.pb;const st=S.settings;
-  const head=`<div class="pub-head"><div class="brand-mark">${ic('polish',24,2)}</div><div><h2>${esc(st.store)}</h2><div class="muted">${esc(st.address)}</div></div></div>`;
-  if(P.done){const b=S.bookings.find(x=>x.id===P.done);if(b){const sv=svcById(b.svc),s=staffById(b.staff);return head+`<div class="card card-b" style="padding:28px"><div class="success" style="padding-top:0"><div class="ring">${ic('check',36,2.4)}</div><h3 style="margin:0;font-size:22px">You're booked in!</h3><div class="muted">See you soon, ${esc(b.name.split(' ')[0])} 💅</div></div>
-    <dl class="dl" style="margin-top:20px"><dt>Service</dt><dd>${esc(sv.name)}</dd><dt>When</dt><dd>${fTimeEn(b.ts)} · ${fDayEn(b.ts)}</dd><dt>Nail technician</dt><dd>${esc(s.name)}</dd><dt>Price</dt><dd>${b.price?money(b.price):'Free'}</dd></dl>
+  const P=UI.pb;const D=PD();const svcOf=id=>D.services.find(x=>x.id===id),stOf=id=>D.staff.find(x=>x.id===id);
+  const head=`<div class="pub-head"><div class="brand-mark">${ic('polish',24,2)}</div><div><h2>${esc(D.store)}</h2><div class="muted">${esc(D.address)}${D.phone?' · '+esc(D.phone):''}</div></div></div>`;
+  if(D.error)return head+`<div class="card card-b"><div class="alert-row" style="background:var(--red-soft);color:var(--red)">${ic('alert',16)}Can't load booking right now. Please call ${esc(D.phone||'the salon')}.</div></div>`;
+  const tabs=D.stripe?`<div class="seg" style="margin-bottom:16px"><button data-act="pb-tab" data-v="book" class="${P.tab!=='gift'?'on':''}">Book an appointment</button><button data-act="pb-tab" data-v="gift" class="${P.tab==='gift'?'on':''}">Buy a gift card</button></div>`:'';
+  if(P.tab==='gift'&&(D.stripe||P.giftSid))return head+tabs+vPublicGift(D);
+  if(P.doneObj){const b=P.doneObj;const sv=svcOf(b.svc)||{name:''},st=stOf(b.staff)||{name:''};return head+tabs+`<div class="card card-b" style="padding:28px"><div class="success" style="padding-top:0"><div class="ring">${ic('check',36,2.4)}</div><h3 style="margin:0;font-size:22px">You're booked in!</h3><div class="muted">See you soon, ${esc(b.name.split(' ')[0])} 💅${P.sms?' · We\'ve sent you an SMS confirmation.':''}</div></div>
+    <dl class="dl" style="margin-top:20px"><dt>Service</dt><dd>${esc(sv.name)}</dd><dt>When</dt><dd>${fTimeEn(b.ts,D.tz)} · ${fDayEn(b.ts,D.tz)}</dd><dt>Nail technician</dt><dd>${esc(st.name)}</dd><dt>Price</dt><dd>${b.price?money(b.price):'Free'}</dd></dl>
     <div class="row" style="margin-top:20px"><button class="btn block" data-act="pb-reset">Make another booking</button></div>
-    <div class="muted" style="text-align:center;margin-top:14px;font-size:12.5px">Need to change or cancel? Call ${esc(st.phone)}. Please give 24 hours notice.</div></div>`}}
-  const sv=svcById(P.svc);const t0=sod(Date.now());
-  const slots=sv?freeSlots(P.day,sv,P.staff):[];
-  return head+`<div class="stack">
-  <div class="card card-b"><div class="step"><i>1</i>Choose a service</div><div class="stack" style="gap:8px">${S.services.map(s=>`<button class="svc ${P.svc===s.id?'on':''}" data-act="pb-svc" data-v="${s.id}"><div class="tile" style="background:var(--accent);opacity:${P.svc===s.id?1:.85}">${ic('calendar',18,2)}</div><div class="grow"><div class="cell-main">${esc(s.name)}</div><div class="cell-sub">${ic('clock',12)} ${s.dur} min</div></div><b class="num">${s.price?money(s.price):'Free'}</b></button>`).join('')}</div></div>
+    <div class="muted" style="text-align:center;margin-top:14px;font-size:12.5px">Need to change or cancel? Call ${esc(D.phone)}. Please give 24 hours notice.</div></div>`}
+  const sv=svcOf(P.svc);const tz=D.tz||LOCAL_TZ;
+  const slots=sv?freeSlots(shopDay(P.dayIdx||0,tz),sv,P.staff,D):[];
+  return head+tabs+`<div class="stack">
+  <div class="card card-b"><div class="step"><i>1</i>Choose a service</div><div class="stack" style="gap:8px">${D.services.map(s=>`<button class="svc ${P.svc===s.id?'on':''}" data-act="pb-svc" data-v="${s.id}"><div class="tile" style="background:var(--accent);opacity:${P.svc===s.id?1:.85}">${ic('calendar',18,2)}</div><div class="grow"><div class="cell-main">${esc(s.name)}</div><div class="cell-sub">${ic('clock',12)} ${s.dur} min</div></div><b class="num">${s.price?money(s.price):'Free'}</b></button>`).join('')||'<div class="muted">No services available online yet.</div>'}</div></div>
   ${sv?`<div class="card card-b"><div class="step"><i>2</i>Pick a time</div>
-    <div class="chips" style="padding-bottom:12px">${[{id:'any',name:'Any technician'},...S.staff].map(s=>`<button class="chip ${P.staff===s.id?'on':''}" data-act="pb-staff" data-v="${s.id}">${esc(s.name)}</button>`).join('')}</div>
-    <div class="days">${Array.from({length:14},(_,i)=>{const d=t0+i*DAY;return `<button class="dayb ${P.day===d?'on':''}" data-act="pb-day" data-v="${d}"><small>${i===0?'Today':new Date(d).toLocaleDateString('en-AU',{weekday:'short'})}</small><b class="num">${new Date(d).getDate()}</b></button>`}).join('')}</div>
-    ${slots.length?`<div class="slots">${slots.map(x=>`<button class="slot ${P.slot&&P.slot.ts===x.ts?'on':''}" data-act="pb-slot" data-v="${x.ts}" data-s="${x.staff}">${fTimeEn(x.ts)}</button>`).join('')}</div>`:`<div class="empty" style="padding:24px">${ic('calendar',32,1.4)}Fully booked on this day. Please try another day.</div>`}
+    <div class="chips" style="padding-bottom:12px">${[{id:'any',name:'Any technician'},...D.staff].map(s=>`<button class="chip ${P.staff===s.id?'on':''}" data-act="pb-staff" data-v="${s.id}">${esc(s.name)}</button>`).join('')}</div>
+    <div class="days">${Array.from({length:14},(_,i)=>{const d=shopDay(i,tz);return `<button class="dayb ${(P.dayIdx||0)===i?'on':''}" data-act="pb-day" data-v="${i}"><small>${i===0?'Today':d.wd}</small><b class="num">${d.d}</b></button>`}).join('')}</div>
+    ${slots.length?`<div class="slots">${slots.map(x=>`<button class="slot ${P.slot&&P.slot.ts===x.ts?'on':''}" data-act="pb-slot" data-v="${x.ts}" data-s="${x.staff}">${fTimeEn(x.ts,tz)}</button>`).join('')}</div>`:`<div class="empty" style="padding:24px">${ic('calendar',32,1.4)}Fully booked on this day. Please try another day.</div>`}
   </div>`:''}
-  ${P.slot?`<div class="card card-b"><div class="step"><i>3</i>Your details</div><div class="form-grid">
+  ${P.slot&&sv?`<div class="card card-b"><div class="step"><i>3</i>Your details</div><div class="form-grid">
     <div class="field"><label for="pb-name">Full name</label><input class="input" id="pb-name" value="${esc(P.name)}" autocomplete="name"></div>
     <div class="field"><label for="pb-phone">Mobile</label><input class="input" id="pb-phone" placeholder="04xx xxx xxx" inputmode="tel" value="${esc(P.phone)}" autocomplete="tel"></div>
     <div class="field span2"><label for="pb-note">Notes (optional): nail shape, colour, removal needed…</label><textarea class="textarea" id="pb-note" style="min-height:64px">${esc(P.note)}</textarea></div></div>
-    <div style="margin-top:16px;padding:14px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)" class="row"><div style="flex:1"><div class="cell-main">${esc(sv.name)}</div><div class="cell-sub">${fTimeEn(P.slot.ts)} · ${fDayEn(P.slot.ts)} · with ${esc(staffById(P.slot.staff).name)}</div></div><b class="num">${sv.price?money(sv.price):'Free'}</b></div>
-    <button class="btn primary lg block" style="margin-top:14px" data-act="pb-submit">Confirm booking</button></div>`:''}
+    <div style="margin-top:16px;padding:14px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)" class="row"><div style="flex:1"><div class="cell-main">${esc(sv.name)}</div><div class="cell-sub">${fTimeEn(P.slot.ts,tz)} · ${fDayEn(P.slot.ts,tz)} · with ${esc((stOf(P.slot.staff)||{}).name||'')}</div></div><b class="num">${sv.price?money(sv.price):'Free'}</b></div>
+    <button class="btn primary lg block" style="margin-top:14px" data-act="pb-submit" ${P.sending?'disabled':''}>${P.sending?'Booking…':'Confirm booking'}</button></div>`:''}
   <div style="text-align:center"><a href="#lich-hen" class="muted" style="font-size:12.5px">← Trang quản lý (chỉ chủ tiệm)</a></div>
+  </div>`;
+}
+function vPublicGift(D){
+  const P=UI.pb,G=UI.gb;
+  if(P.giftSid){
+    if(P.giftCard){const c=P.giftCard;return `<div class="card card-b stack" style="padding:24px"><div class="success" style="padding:0"><div class="ring">${ic('check',36,2.4)}</div><h3 style="margin:0;font-size:22px">Thank you! Your gift card is ready</h3><div class="muted">Take a screenshot or copy the code below.${G.phone?' We\'ve also sent it by SMS.':''}</div></div>
+      <div style="display:flex;justify-content:center">${gcCardHtml({...c},true)}</div>
+      <button class="btn block" data-act="pb-copy-code" data-v="${esc(c.code)}">${ic('copy',16)}Copy code ${esc(c.code)}</button>
+      <div class="muted" style="text-align:center;font-size:12.5px">Show this code when paying at ${esc(D.store)}. Valid until ${fDateY(c.expires)}.</div></div>`}
+    return `<div class="card card-b"><div class="empty">${P.giftErr?esc(P.giftErr):'Confirming your payment…'}</div></div>`;
+  }
+  const preview={amount:G.amount,to:G.to,design:G.design,code:'',expires:Date.now()+(D.gcMonths||36)*30.44*DAY};
+  return `<div class="card card-b stack">
+    <div style="display:flex;justify-content:center">${gcCardHtml(preview)}</div>
+    <div class="field"><label>Amount</label><div class="row" style="flex-wrap:wrap;gap:6px">${(D.gcAmounts||[50,80,100,150,200]).map(a=>`<button class="chip ${G.amount===a?'on':''}" data-act="gb-amt" data-v="${a}">${money(a)}</button>`).join('')}</div></div>
+    <div class="field"><label>Design</label><div class="swatches">${Object.entries(GC_DESIGNS).map(([k,bg])=>`<button class="swatch ${k===G.design?'on':''}" data-act="gb-design" data-v="${k}" style="background:${bg}" aria-label="Design ${k}"></button>`).join('')}</div></div>
+    <div class="form-grid">
+      <div class="field"><label for="gb-to">To</label><input class="input" id="gb-to" maxlength="40" value="${esc(G.to)}" placeholder="Recipient's name"></div>
+      <div class="field"><label for="gb-from">From</label><input class="input" id="gb-from" maxlength="40" value="${esc(G.from)}" placeholder="Your name"></div>
+      <div class="field"><label for="gb-phone">Your mobile (we SMS the code)</label><input class="input" id="gb-phone" inputmode="tel" value="${esc(G.phone)}" placeholder="04xx xxx xxx"></div>
+      <div class="field"><label for="gb-email">Email for receipt</label><input class="input" id="gb-email" type="email" value="${esc(G.email)}" placeholder="you@example.com"></div>
+      <div class="field span2"><label for="gb-msg">Message (optional)</label><input class="input" id="gb-msg" maxlength="120" value="${esc(G.msg)}" placeholder="Happy birthday!"></div>
+    </div>
+    <button class="btn primary lg block" data-act="gb-buy" ${G.sending?'disabled':''}>${G.sending?'Opening secure checkout…':'Pay '+money(G.amount)+' securely'}</button>
+    <div class="muted" style="text-align:center;font-size:12.5px">Payment by card via Stripe. Valid for ${Math.round((D.gcMonths||36)/12)} years.</div>
   </div>`;
 }
 
@@ -1475,7 +1683,7 @@ const VIEWS={'the-qua-tang':vGiftCards,'dat-lich':vPublic,'lich-hen':vBookings,'
 let lastFocus=null;
 function openModal(html,cls=''){closeOverlay(true);lastFocus=document.activeElement;const o=document.createElement('div');o.className='overlay';o.innerHTML=`<div class="modal ${cls}" role="dialog" aria-modal="true">${html}</div>`;o.addEventListener('mousedown',e=>{if(e.target===o)closeOverlay()});$('#overlay-root').appendChild(o);return o.firstElementChild}
 function openDrawer(html){closeOverlay(true);lastFocus=document.activeElement;const o=document.createElement('div');o.className='overlay drawer-o';o.innerHTML=`<div class="drawer" role="dialog" aria-modal="true">${html}</div>`;o.addEventListener('mousedown',e=>{if(e.target===o)closeOverlay()});$('#overlay-root').appendChild(o);const f=o.querySelector('button');f&&f.focus();return o.firstElementChild}
-function closeOverlay(keepFocus){$('#overlay-root').innerHTML='';if(!keepFocus&&lastFocus&&document.contains(lastFocus))lastFocus.focus()}
+function closeOverlay(keepFocus){$('#overlay-root').innerHTML='';if(!keepFocus&&lastFocus&&document.contains(lastFocus))lastFocus.focus();if(CLOUD.viewDirty)setTimeout(remoteRender,0)}
 function confirmBox(title,msg,okLabel,fn){const el=openModal(`<div class="modal-h"><h3>${esc(title)}</h3></div><div class="modal-b muted">${esc(msg)}</div><div class="modal-f"><button class="btn" data-act="close">Huỷ</button><button class="btn primary" id="cb-ok" style="background:var(--red);border-color:var(--red);color:#fff">${esc(okLabel)}</button></div>`);$('#cb-ok',el).onclick=()=>{closeOverlay();fn()};$('#cb-ok',el).focus()}
 function toast(msg,icon='check'){const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.innerHTML=ic(icon,18,2.2)+esc(msg);if(icon==='alert')t.querySelector('svg').style.color='var(--amber)';$('#toasts').appendChild(t);setTimeout(()=>{t.style.transition='opacity .3s';t.style.opacity='0';setTimeout(()=>t.remove(),300)},2400)}
 
@@ -1552,9 +1760,9 @@ document.addEventListener('click',e=>{
       if(sold.some(g=>g.balance<g.amount&&g.status!=='void')){toast('Không hoàn được: thẻ quà tặng trong đơn đã được dùng','alert');break}
       const g=o.gift?gcById(o.gift.vid):null;const cashBack=o.total-(o.gift?o.gift.amt:0);
       const msg=(cashBack?'Khách được hoàn '+money(cashBack)+' bằng '+METHODS[o.method].label.toLowerCase()+'. ':'')+(g?money(o.gift.amt)+' được trả lại vào thẻ '+g.code+'. ':'')+(sold.length?sold.length+' thẻ quà tặng bán trong đơn sẽ bị huỷ. ':'')+'Số lượng món được cộng lại vào kho.';
-      confirmBox('Hoàn tiền đơn #'+o.no+'?',msg,'Hoàn tiền',()=>{const now=Date.now();o.status='refunded';for(const i of o.items){const p=prodById(i.p);if(tracks(p))p.stock+=i.q}
-        for(const x of sold){if(x.status!=='void'){x.log.push({ts:now,type:'void',amt:x.balance,order:o.id});x.status='void'}}
-        if(g){g.balance+=o.gift.amt;g.log.push({ts:now,type:'refund',amt:o.gift.amt,order:o.id})}
+      confirmBox('Hoàn tiền đơn #'+o.no+'?',msg,'Hoàn tiền',async()=>{
+        try{for(const x of sold)if(x.status!=='void')await gcOp(x.id,'void',{order:o.id});if(g)await gcOp(g.id,'refund',{amt:o.gift.amt,order:o.id})}catch(e){toast(e.message,'alert');return}
+        o.status='refunded';for(const i of o.items){const p=prodById(i.p);if(tracks(p))p.stock+=i.q}
         save();render();openOrder(o.id);toast('Đã hoàn tiền đơn #'+o.no)});break}
     case 'o-status':UI.oStatus=v;UI.oLimit=40;render();break;
     case 'o-more':UI.oLimit+=60;render();break;
@@ -1568,8 +1776,21 @@ document.addEventListener('click',e=>{
     case 'export-csv':{if(v==='range'){const B=bounds(UI.rRange);exportOrders(ordersBetween(B.start,B.end))}else exportOrders(filteredOrders());break}
     case 'export-cust':{const st=custStats();const rows=[['Tên','SĐT','Email','Số lần mua','Tổng chi','Lần cuối','Ghi chú']];S.customers.forEach(c=>{const s=st[c.id];rows.push([c.name,c.phone,c.email,s.visits,s.spent,s.last?fDateY(s.last):'',c.note])});download('khach-hang.csv','﻿'+rows.map(r=>r.map(csvCell).join(',')).join('\n'),'text/csv');toast('Đã xuất danh sách khách');break}
     case 'export-json':download('quay-sao-luu.json',JSON.stringify(S),'application/json');toast('Đã tải bản sao lưu');break;
-    case 'reset-demo':confirmBox('Tạo lại dữ liệu mẫu?','Toàn bộ dữ liệu hiện tại sẽ bị thay bằng dữ liệu mẫu.','Tạo lại',()=>{S=seed();cart.lines.clear();cart.cust=null;save();applyTheme();render();toast('Đã tạo lại dữ liệu mẫu')});break;
-    case 'clear-all':confirmBox('Xoá toàn bộ đơn & khách?','Sản phẩm và cài đặt được giữ lại. Không thể hoàn tác.','Xoá hết',()=>{S.orders=[];S.customers=[];S.seq=1001;cart.cust=null;save();render();toast('Đã xoá dữ liệu')});break;
+    case 'reset-demo':confirmBox('Tạo lại dữ liệu mẫu?','Toàn bộ dữ liệu hiện tại'+(CLOUD.on?' trên máy chủ (mọi máy)':'')+' sẽ bị thay bằng dữ liệu mẫu.','Tạo lại',async()=>{const d=seed();d.vouchers=seedVouchers(mulberry32(9),d.customers);cart.lines.clear();cart.cust=null;
+      if(CLOUD.on){try{await api('POST','/api/reset',{confirm:'XOA'})}catch(e){return toast(e.message,'alert')}await startCloud(d)}else{S=d;save();render()}applyTheme();toast('Đã tạo lại dữ liệu mẫu')});break;
+    case 'setup-empty':startCloud(emptyShop()).then(()=>toast('Đã tạo tiệm. Vào Cài đặt để sửa thông tin, thợ và dịch vụ.'));break;
+    case 'setup-demo':{const d=seed();d.vouchers=seedVouchers(mulberry32(9),d.customers);startCloud(d).then(()=>toast('Đã nạp dữ liệu mẫu'));break}
+    case 'logout':confirmBox('Đăng xuất máy này?','Cần nhập lại mật khẩu tiệm để vào lại.','Đăng xuất',()=>cloudLogout(false));break;
+    case 'logout-all':confirmBox('Đăng xuất mọi máy?','Tất cả máy (kể cả máy này) phải đăng nhập lại. Dùng khi mất máy hoặc đổi nhân viên.','Đăng xuất hết',async()=>{try{await api('POST','/api/logout-all')}catch(e){}cloudLogout(false)});break;
+    case 'sms-test':{const ph=$('#sms-ph').value.trim();if(!ph)return toast('Nhập số điện thoại','alert');api('POST','/api/sms-test',{phone:ph}).then(()=>{toast('Đã gửi SMS thử');UI.srv=null;render()},e=>toast(e.message,'alert'));break}
+    case 'b-sms':api('POST','/api/sms-booking',{id:v}).then(()=>toast('Đã gửi SMS xác nhận cho khách'),e=>toast(e.message,'alert'));break;
+    case 'staff-add':S.staff.push({id:'s'+uid(),name:'Thợ mới',color:TILE[S.staff.length%TILE.length]});save();render();break;
+    case 'staff-del':{const x=staffById(v);const fut=S.bookings.filter(b=>b.staff===v&&b.ts>Date.now()&&b.status==='booked').length;confirmBox('Xoá thợ '+x.name+'?',fut?'Thợ này còn '+fut+' lịch hẹn sắp tới. Hãy chuyển lịch cho thợ khác trước.':'Đơn cũ vẫn giữ tên thợ trong báo cáo.','Xoá',()=>{if(fut)return toast('Chuyển '+fut+' lịch sang thợ khác trước','alert');S.staff=S.staff.filter(y=>y.id!==v);save();render()});break}
+    case 'svc-add':S.services.push({id:'v'+uid(),name:'New service',dur:60,price:50});save();render();break;
+    case 'svc-del':S.services=S.services.filter(y=>y.id!==v);save();render();break;
+    case 'copy-pub':copyText(location.origin+location.pathname+'#dat-lich','Đã sao chép link đặt lịch');break;
+    case 'clear-all':confirmBox('Xoá toàn bộ dữ liệu bán hàng?','Xoá đơn, khách, lịch hẹn và thẻ quà tặng'+(CLOUD.on?' trên mọi máy':'')+'. Dịch vụ, thợ và cài đặt được giữ lại. Không thể hoàn tác.','Xoá hết',async()=>{const d={...S,orders:[],customers:[],bookings:[],vouchers:[],seq:1001};cart.cust=null;cart.redeem=null;
+      if(CLOUD.on){try{await api('POST','/api/reset',{confirm:'XOA'})}catch(e){return toast(e.message,'alert')}await startCloud(d)}else{S=d;save();render()}toast('Đã xoá dữ liệu')});break;
     case 'set-theme':S.settings.theme=v;save();applyTheme();render();break;
     // gift cards
     case 'gc-sell':openGiftSell();break;
@@ -1579,8 +1800,8 @@ document.addEventListener('click',e=>{
     case 'gc-copy':copyText(gcById(v).code,'Đã sao chép mã '+gcById(v).code);break;
     case 'gc-copy-msg':copyText(gcMessage(gcById(v)),'Đã sao chép tin nhắn tiếng Anh, dán vào SMS/Messenger để gửi khách');break;
     case 'gc-use':{const g=gcById(v);cart.redeem=g.id;closeOverlay(true);if(route()==='ban-hang')refreshPOS();else go('ban-hang');toast('Thẻ '+g.code+' sẽ được trừ khi thanh toán');break}
-    case 'gc-extend':{const g=gcById(v);g.expires=Math.max(g.expires,Date.now())+91*DAY;g.log.push({ts:Date.now(),type:'extend',amt:0});save();if(route()==='the-qua-tang')render();openGiftCard(g.id);toast('Đã gia hạn đến '+fDateY(g.expires));break}
-    case 'gc-void':{const g=gcById(v);confirmBox('Huỷ thẻ '+g.code+'?','Số dư '+money(g.balance)+' sẽ không dùng được nữa. Chỉ huỷ khi thẻ bị lộ mã hoặc đã hoàn tiền cho khách.','Huỷ thẻ',()=>{g.log.push({ts:Date.now(),type:'void',amt:g.balance});g.status='void';save();render();openGiftCard(g.id);toast('Đã huỷ thẻ')});break}
+    case 'gc-extend':gcOp(v,'extend',{days:91}).then(g=>{if(route()==='the-qua-tang')render();openGiftCard(g.id);toast('Đã gia hạn đến '+fDateY(g.expires))},e=>toast(e.message,'alert'));break;
+    case 'gc-void':{const g=gcById(v);confirmBox('Huỷ thẻ '+g.code+'?','Số dư '+money(g.balance)+' sẽ không dùng được nữa. Chỉ huỷ khi thẻ bị lộ mã hoặc đã hoàn tiền cho khách.','Huỷ thẻ',()=>gcOp(g.id,'void').then(()=>{render();openGiftCard(g.id);toast('Đã huỷ thẻ')},e=>toast(e.message,'alert')));break}
     case 'g-filter':UI.gF=v;render();break;
     // bookings
     case 'b-day':UI.bDate=v==='0'?sod(Date.now()):sod(UI.bDate+(+v)*DAY+DAY/2);render();break;
@@ -1594,21 +1815,35 @@ document.addEventListener('click',e=>{
     case 'copy-link':{const i=$('#pub-url');i.select();(navigator.clipboard?navigator.clipboard.writeText(i.value):Promise.reject()).then(()=>toast('Đã sao chép link đặt lịch'),()=>{try{document.execCommand('copy');toast('Đã sao chép link đặt lịch')}catch(_){toast('Hãy sao chép thủ công','alert')}});break}
     case 'pb-svc':UI.pb.svc=v;UI.pb.slot=null;render();break;
     case 'pb-staff':UI.pb.staff=v;UI.pb.slot=null;render();break;
-    case 'pb-day':UI.pb.day=+v;UI.pb.slot=null;render();break;
+    case 'pb-day':UI.pb.dayIdx=+v;UI.pb.slot=null;render();break;
     case 'pb-slot':UI.pb.slot={ts:+v,staff:t.dataset.s};render();setTimeout(()=>{const n=$('#pb-name');n&&n.scrollIntoView({behavior:'smooth',block:'center'});n&&!n.value&&n.focus({preventScroll:true})},30);break;
-    case 'pb-submit':{const P=UI.pb;const sv=svcById(P.svc);const phone=P.phone.trim();
+    case 'pb-submit':{const P=UI.pb;const D=PD();const sv=D.services.find(x=>x.id===P.svc);const phone=P.phone.trim();
       if(!P.name.trim()){$('#pb-name').focus();return toast('Please enter your name','alert')}
       if(phone.replace(/\D/g,'').length<9){$('#pb-phone').focus();return toast('Please enter a valid mobile number','alert')}
+      if(CLOUD.on){P.sending=true;render();api('POST','/api/public/book',{svc:sv.id,staff:P.staff==='any'?P.slot.staff:P.staff,ts:P.slot.ts,name:P.name.trim(),phone,note:P.note.trim()}).then(r=>{P.sending=false;P.doneObj=r.booking;P.sms=r.sms;P.slot=null;loadPub().then(render);window.scrollTo(0,0)},e=>{P.sending=false;if(e.status===409){P.slot=null;loadPub().then(render)}else render();toast(e.message,'alert')});break}
       if(S.bookings.some(b=>b.staff===P.slot.staff&&overlaps(b,P.slot.ts,sv.dur))){P.slot=null;render();return toast('Sorry, that time was just taken. Please pick another.','alert')}
       let c=S.customers.find(x=>x.phone.replace(/\D/g,'')===phone.replace(/\D/g,''));if(!c){c={id:'c'+uid(),name:P.name.trim(),phone,email:'',note:'',created:Date.now()};S.customers.push(c)}
       const b={id:uid(),ts:P.slot.ts,dur:sv.dur,svc:sv.id,price:sv.price,staff:P.slot.staff,cust:c.id,name:P.name.trim(),phone,status:'booked',note:P.note.trim(),src:'online',created:Date.now()};
-      S.bookings.push(b);save();P.done=b.id;render();window.scrollTo(0,0);break}
-    case 'pb-reset':UI.pb={svc:null,staff:'any',day:sod(Date.now()),slot:null,name:UI.pb.name,phone:UI.pb.phone,note:'',done:null};render();break;
+      S.bookings.push(b);save();P.doneObj=b;P.slot=null;render();window.scrollTo(0,0);break}
+    case 'pb-tab':UI.pb.tab=v;render();break;
+    case 'gb-amt':UI.gb.amount=+v;render();break;
+    case 'gb-design':UI.gb.design=v;render();break;
+    case 'pb-copy-code':copyText(v,'Code copied');break;
+    case 'gb-buy':{const G=UI.gb;if(G.phone.replace(/\D/g,'').length<9){$('#gb-phone').focus();return toast('Please enter your mobile so we can SMS the code','alert')}
+      G.sending=true;render();api('POST','/api/public/gift-checkout',{amount:G.amount,to:G.to,from:G.from,phone:G.phone,email:G.email,msg:G.msg,design:G.design}).then(r=>{location.href=r.url},e=>{G.sending=false;render();toast(e.message,'alert')});break}
+    case 'pb-reset':UI.pb={svc:null,staff:'any',day:sod(Date.now()),slot:null,name:UI.pb.name,phone:UI.pb.phone,note:'',done:null,doneObj:null,tab:'book'};render();break;
   }
+});
+document.addEventListener('submit',async e=>{
+  if(e.target.id!=='login-f')return;e.preventDefault();
+  const pw=$('#lg-pw').value,dev=$('#lg-dev').value.trim()||'Thiết bị';lsSet('quay.device',dev);
+  try{const r=await api('POST','/api/login',{password:pw,device:dev});CLOUD.token=r.token;lsSet('quay.token',r.token);UI.gateErr='';await enterApp()}
+  catch(err){UI.gateErr=err.message;UI.gate='login';render()}
 });
 document.addEventListener('input',e=>{
   const t=e.target;
   if(t.id==='pb-name'||t.id==='pb-phone'||t.id==='pb-note'){UI.pb[t.id.slice(3)]=t.value}
+  else if(/^gb-(to|from|phone|email|msg)$/.test(t.id)){UI.gb[t.id.slice(3)]=t.value;if(t.id==='gb-to'){const c=$('.gc-card .gc-to');if(c)c.textContent=t.value?'For '+t.value:''}}
   else if(t.id==='pos-q'){UI.posQ=t.value;refreshPOS()}
   else if(t.id==='o-q'){UI.oQ=t.value;UI.oLimit=40;rerenderKeepFocus(t)}
   else if(t.id==='p-q'){UI.pQ=t.value;rerenderKeepFocus(t)}
@@ -1620,7 +1855,9 @@ document.addEventListener('change',e=>{
   if(t.id==='b-date'&&t.value){const [y,m,d]=t.value.split('-').map(Number);UI.bDate=new Date(y,m-1,d).getTime();render()}
   else if(t.id==='o-m'){UI.oMethod=t.value;UI.oLimit=40;render()}
   else if(t.id==='c-s'){UI.cSort=t.value;render()}
-  else if(t.dataset.set){const k=t.dataset.set;S.settings[k]=k==='tax'||k==='commission'?Math.max(0,Math.min(100,+t.value||0)):k==='gcMonths'?Math.max(36,Math.min(120,+t.value||36)):t.value.trim();if(k==='gcMonths')t.value=S.settings.gcMonths;save();renderShell();toast('Đã lưu cài đặt')}
+  else if(t.dataset.staff){const x=staffById(t.dataset.staff);if(x&&t.value.trim()){x.name=t.value.trim().slice(0,30);save();toast('Đã lưu tên thợ')}}
+  else if(t.dataset.svc){const x=S.services.find(y=>y.id===t.dataset.svc);if(x){const f=t.dataset.f;x[f]=f==='name'?(t.value.trim()||x.name):f==='dur'?Math.max(15,Math.min(300,parseInt(t.value)||x.dur)):parseMoney(t.value);t.value=x[f];save();toast('Đã lưu dịch vụ đặt lịch')}}
+  else if(t.dataset.set){const k=t.dataset.set;const NUMS={tax:[0,100,0],commission:[0,100,40],gcMonths:[36,120,36],openHour:[5,12,9],closeHour:[13,23,19],surcharge:[0,5,0]};if(NUMS[k]){const [lo,hi,df]=NUMS[k];const n=parseFloat(t.value);S.settings[k]=isFinite(n)?Math.max(lo,Math.min(hi,n)):df;t.value=S.settings[k]}else S.settings[k]=t.value.trim();save();renderShell();toast('Đã lưu cài đặt')}
 });
 function rerenderKeepFocus(input){const id=input.id,pos=input.selectionStart;render();const n=document.getElementById(id);if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}}
 document.addEventListener('keydown',e=>{
@@ -1633,7 +1870,14 @@ document.addEventListener('keydown',e=>{
 });
 
 /* boot */
-applyTheme();hydrateIcons();render();
+async function boot(){
+  applyTheme();hydrateIcons();
+  let server=false;
+  if(/^https?:$/.test(location.protocol)){try{const r=await fetch('/api/hello',{cache:'no-store'});if(r.ok){const j=await r.json();server=!!j&&j.app==='quay'}}catch(e){}}
+  if(server){CLOUD.on=true;CLOUD.token=lsGet('quay.token');const g=new URLSearchParams(location.search).get('gift');if(g){UI.pb.giftSid=g;UI.pb.tab='gift';pollGift()}}
+  render();
+}
+boot();
 </script>
 </body>
 </html>
