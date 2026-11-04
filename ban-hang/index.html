@@ -291,6 +291,27 @@ svg{display:block;flex:none}
 .bottom-nav{display:none}
 
 /* =========================================================
+   GIFT CARDS
+   ========================================================= */
+.gc-card{position:relative;aspect-ratio:1.62;width:100%;max-width:360px;border-radius:18px;padding:18px 20px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;box-shadow:0 12px 28px -12px rgba(16,24,40,.45)}
+.gc-card::after{content:'';position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.1)}
+.gc-card::before{content:'';position:absolute;right:30px;bottom:-70px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.07)}
+.gc-card>*{position:relative;z-index:1}
+.gc-top{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:13px;gap:8px}
+.gc-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;opacity:.9;white-space:nowrap}
+.gc-amt{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.gc-card.big .gc-amt{font-size:36px}
+.gc-to{opacity:.9;font-size:13px;margin-top:2px}
+.gc-bot{display:flex;justify-content:space-between;align-items:flex-end;font-size:11.5px;opacity:.92;gap:8px}
+.gc-code{font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:.06em;opacity:1}
+.gc-mini{width:46px;height:30px;border-radius:6px;flex:none;display:grid;place-items:center;color:#fff}
+.swatches{display:flex;gap:8px}
+.swatch{width:34px;height:34px;border-radius:10px;border:2px solid transparent;outline:2px solid transparent;transition:outline-color .15s}
+.swatch.on{outline-color:var(--accent);border-color:var(--surface)}
+.gc-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:700px){.gc-split{grid-template-columns:minmax(0,1fr)}}
+
+/* =========================================================
    BOOKINGS
    ========================================================= */
 .datenav{display:flex;align-items:center;gap:6px}
@@ -458,6 +479,8 @@ const ICONS={
   bag:'<path d="M5 8h14l-1.2 12H6.2z"/><path d="M9 8a3 3 0 0 1 6 0"/>',
   back:'<path d="m15 6-6 6 6 6"/>',
   note:'<path d="M5 4h14v16H5z"/><path d="M9 9h6M9 13h6"/>',
+  gift:'<rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12.5h18M12 8v13"/><path d="M12 8C10.5 4 6.5 3.8 6.5 6.2 6.5 8 9.5 8 12 8zM12 8c1.5-4 5.5-4.2 5.5-1.8C17.5 8 14.5 8 12 8z"/>',
+  copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
   calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
@@ -499,7 +522,9 @@ const METHODS={
   qr:{label:'Chuyển khoản',icon:'qr',color:'var(--sky)'},
   card:{label:'Thẻ',icon:'card',color:'var(--accent)'},
   wallet:{label:'Ví điện tử',icon:'wallet',color:'var(--pink)'},
+  gift:{label:'Thẻ quà tặng',icon:'gift',color:'var(--amber)'},
 };
+const PAY_METHODS=['cash','qr','card','wallet'];
 const TILE=['#5046e5','#0f9f58','#e2474c','#c27c00','#0b8fd6','#c026d3','#0d9488','#ea580c','#7c3aed','#be123c'];
 let S;
 
@@ -568,7 +593,39 @@ function seedBookings(R,customers){
   }
   return {staff,services,bookings};
 }
-function load(){try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);if(d&&d.v===2)return d;if(d&&d.v===1){Object.assign(d,seedBookings(mulberry32(7),d.customers),{v:2});return d}}}catch(e){}return seed()}
+function load(){let d=null;try{const raw=localStorage.getItem(KEY);if(raw)d=JSON.parse(raw)}catch(e){}
+  if(!d||(d.v!==1&&d.v!==2))d=seed();
+  if(d.v===1)Object.assign(d,seedBookings(mulberry32(7),d.customers),{v:2});
+  if(!d.vouchers)d.vouchers=seedVouchers(mulberry32(9),d.customers);
+  if(!d.settings.gcMonths)d.settings.gcMonths=12;
+  return d}
+const GC_ALPHA='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function gcCode(R=Math.random){let c;do{c='GC-';for(let i=0;i<8;i++){if(i===4)c+='-';c+=GC_ALPHA[Math.floor(R()*GC_ALPHA.length)]}}while(S&&S.vouchers&&S.vouchers.some(v=>v.code===c));return c}
+const GC_DESIGNS={indigo:'linear-gradient(135deg,#4338ca 0%,#7c3aed 100%)',rose:'linear-gradient(135deg,#be123c 0%,#f97316 100%)',forest:'linear-gradient(135deg,#047857 0%,#0d9488 100%)',night:'linear-gradient(135deg,#0f172a 0%,#334155 100%)',gold:'linear-gradient(135deg,#92400e 0%,#d97706 100%)'};
+const GC_AMOUNTS=[100000,200000,300000,500000,1000000];
+function seedVouchers(R,customers){
+  const out=[];const now=Date.now();const ds=Object.keys(GC_DESIGNS);
+  const msgs=['Chúc mừng sinh nhật! 🎂','Cảm ơn vì đã luôn bên cạnh','Chúc mừng 20/10','Mừng bạn có job mới!','Thưởng cho team tháng này',''];
+  const tos=['Lan Anh','Minh Khoa','Chị Hằng','Team Marketing','Bảo Ngọc','Anh Tuấn','Thu Hà','Quỳnh Như'];
+  for(let i=0;i<16;i++){
+    const created=now-Math.floor(R()*75)*DAY-Math.floor(R()*10)*3600e3;const amount=GC_AMOUNTS[Math.floor(R()*GC_AMOUNTS.length)];
+    const buyer=customers[Math.floor(R()*customers.length)];
+    const v={id:'g'+(i+1),code:gcCode(R),amount,balance:amount,cust:buyer.id,to:tos[Math.floor(R()*tos.length)],msg:msgs[Math.floor(R()*msgs.length)],design:ds[i%ds.length],created,expires:created+365*DAY,status:'active',log:[{ts:created,type:'issue',amt:amount}]};
+    let t=created;const uses=Math.floor(R()*4);
+    for(let u=0;u<uses&&v.balance>0;u++){t+=Math.floor(1+R()*12)*DAY;if(t>now)break;const amt=Math.min(v.balance,Math.round((40000+R()*160000)/1000)*1000);v.balance-=amt;v.log.push({ts:t,type:'redeem',amt})}
+    if(i===5){v.status='void';v.log.push({ts:created+DAY,type:'void',amt:v.balance})}
+    out.push(v);
+  }
+  return out;
+}
+const gcById=id=>S.vouchers.find(v=>v.id===id);
+const gcNorm=s=>String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+const gcFind=code=>{const n=gcNorm(code);return n?S.vouchers.find(v=>gcNorm(v.code)===n||gcNorm(v.code)==='GC'+n):null};
+function gcState(v){const now=Date.now();if(v.status==='void')return {k:'void',label:'Đã huỷ',cls:''};if(v.balance<=0)return {k:'used',label:'Đã dùng hết',cls:''};if(v.expires<now)return {k:'expired',label:'Hết hạn',cls:'red'};if(v.balance<v.amount)return {k:'partial',label:'Đang dùng',cls:'amber'};return {k:'new',label:'Chưa dùng',cls:'green'}}
+function gcCardHtml(v,big){return `<div class="gc-card ${big?'big':''}" style="background:${GC_DESIGNS[v.design]||GC_DESIGNS.indigo}">
+  <div class="gc-top"><span>${esc(S.settings.store)}</span><span class="gc-tag">${ic('gift',14,2)}Thẻ quà tặng</span></div>
+  <div><div class="gc-amt num">${money(v.amount)}</div>${v.to?`<div class="gc-to">Tặng ${esc(v.to)}</div>`:''}</div>
+  <div class="gc-bot"><span class="gc-code">${esc(v.code||'GC-••••-••••')}</span><span>HSD ${fDateY(v.expires||Date.now()+365*DAY)}</span></div></div>`}
 let saveT;function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}},150)}
 S=load();save();
 
@@ -577,7 +634,7 @@ const custById=id=>S.customers.find(c=>c.id===id);
 const catById=id=>S.categories.find(c=>c.id===id);
 const svcById=id=>S.services.find(s=>s.id===id);
 const staffById=id=>S.staff.find(s=>s.id===id);
-function lineInfo(key){if(String(key).startsWith('svc:')){const s=svcById(key.slice(4));return s&&{id:key,name:s.name,price:s.price,cost:0,stock:Infinity,svc:true}}return prodById(key)}
+function lineInfo(key){if(String(key).startsWith('gc:')){const g=cart.gcNew[key];return g&&{id:key,name:'Thẻ quà tặng '+compact(g.amount),price:g.amount,cost:0,stock:1,gc:true}}if(String(key).startsWith('svc:')){const s=svcById(key.slice(4));return s&&{id:key,name:s.name,price:s.price,cost:0,stock:Infinity,svc:true}}return prodById(key)}
 const BST={booked:{label:'Đã đặt',cls:'accent'},arrived:{label:'Đã đến',cls:'amber'},done:{label:'Hoàn tất',cls:'green'},noshow:{label:'Không đến',cls:'red'},cancelled:{label:'Đã huỷ',cls:''}};
 const overlaps=(b,ts,dur,skip)=>b.id!==skip&&b.status!=='cancelled'&&b.ts<ts+dur*60e3&&b.ts+b.dur*60e3>ts;
 const ymd=t=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
@@ -585,12 +642,14 @@ const hm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2
 const fDayLong=t=>['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy'][new Date(t).getDay()]+', '+fDateY(t);
 const isPaid=o=>o.status==='paid';
 function ordersBetween(a,b){return S.orders.filter(o=>o.ts>=a&&o.ts<b)}
+const isGcItem=i=>String(i.p).startsWith('gc:');
 function summarize(list){
-  const r={net:0,count:0,gross:0,disc:0,tax:0,cost:0,refunds:0,refundAmt:0,items:0,cust:new Set()};
+  const r={gcSold:0,giftPaid:0,net:0,count:0,gross:0,disc:0,tax:0,cost:0,refunds:0,refundAmt:0,items:0,cust:new Set()};
   for(const o of list){
     if(!isPaid(o)){r.refunds++;r.refundAmt+=o.total;continue}
-    r.net+=o.total;r.count++;r.gross+=o.sub;r.disc+=o.disc;r.tax+=o.tax||0;
-    for(const i of o.items){r.cost+=(i.c||0)*i.q;r.items+=i.q}
+    const gs=o.gcSold||0;r.gcSold+=gs;r.giftPaid+=o.gift?o.gift.amt:0;
+    r.net+=o.total-gs;r.count++;r.gross+=o.sub-gs;r.disc+=o.disc;r.tax+=o.tax||0;
+    for(const i of o.items){if(isGcItem(i))continue;r.cost+=(i.c||0)*i.q;r.items+=i.q}
     if(o.cust)r.cust.add(o.cust);
   }
   r.aov=r.count?r.net/r.count:0;r.profit=r.net-r.tax-r.cost;r.customers=r.cust.size;return r;
@@ -625,11 +684,12 @@ const ROUTES=[
   {id:'don-hang',label:'Đơn hàng',icon:'receipt',key:'4'},
   {id:'san-pham',label:'Sản phẩm',icon:'box',key:'5'},
   {id:'khach-hang',label:'Khách hàng',icon:'users',key:'6'},
-  {id:'bao-cao',label:'Báo cáo',icon:'chart',key:'7'},
-  {id:'cai-dat',label:'Cài đặt',icon:'settings',key:'8'},
+  {id:'the-qua-tang',label:'Thẻ quà tặng',icon:'gift',key:'7'},
+  {id:'bao-cao',label:'Báo cáo',icon:'chart',key:'8'},
+  {id:'cai-dat',label:'Cài đặt',icon:'settings',key:'9'},
 ];
-const UI={range:'7d',rRange:'30d',posCat:'all',posQ:'',oQ:'',oMethod:'all',oStatus:'all',oLimit:40,pQ:'',pCat:'all',cQ:'',cSort:'spent',bDate:sod(Date.now()),pb:{svc:null,staff:'any',day:sod(Date.now()),slot:null,name:'',phone:'',note:'',done:null}};
-const cart={lines:new Map(),cust:null,disc:{type:'pct',v:0},note:'',booking:null};
+const UI={range:'7d',rRange:'30d',posCat:'all',posQ:'',oQ:'',oMethod:'all',oStatus:'all',oLimit:40,pQ:'',pCat:'all',cQ:'',cSort:'spent',gQ:'',gF:'all',bDate:sod(Date.now()),pb:{svc:null,staff:'any',day:sod(Date.now()),slot:null,name:'',phone:'',note:'',done:null}};
+const cart={lines:new Map(),cust:null,disc:{type:'pct',v:0},note:'',booking:null,gcNew:{},redeem:null};
 const BN=['tong-quan','ban-hang','lich-hen','don-hang'];
 const route=()=>{const r=(location.hash||'').replace(/^#\/?/,'');return r==='dat-lich'||ROUTES.some(x=>x.id===r)?r:'tong-quan'};
 const go=id=>{location.hash='#'+id};
@@ -721,10 +781,10 @@ function vDashboard(){
   const greet=h<11?'Chào buổi sáng':h<14?'Chào buổi trưa':h<18?'Chào buổi chiều':'Chào buổi tối';
   const kpi=(lbl,val,cv,pv,key)=>`<div class="card kpi"><div class="lbl">${lbl}</div><div class="val num">${val}</div><div class="foot">${deltaHtml(cv,pv)}<span>so với kỳ trước</span></div><div class="spark" style="width:84px">${chartSlot({type:'spark',h:30,data:series.map(x=>x[key])})}</div></div>`;
   // top products
-  const pm={};for(const o of cur){if(!isPaid(o))continue;for(const i of o.items){pm[i.p]=pm[i.p]||{n:i.n,q:0,v:0};pm[i.p].q+=i.q;pm[i.p].v+=i.q*i.pr}}
+  const pm={};for(const o of cur){if(!isPaid(o))continue;for(const i of o.items){if(isGcItem(i))continue;pm[i.p]=pm[i.p]||{n:i.n,q:0,v:0};pm[i.p].q+=i.q;pm[i.p].v+=i.q*i.pr}}
   const top=Object.entries(pm).sort((x,y)=>y[1].v-x[1].v).slice(0,5);const topMax=top[0]?top[0][1].v:1;
   // methods
-  const mm={};for(const o of cur){if(isPaid(o))mm[o.method]=(mm[o.method]||0)+o.total}
+  const mm={};for(const o of cur){if(!isPaid(o))continue;const g=o.gift?o.gift.amt:0;if(o.total-g>0)mm[o.method]=(mm[o.method]||0)+o.total-g;if(g)mm.gift=(mm.gift||0)+g}
   const mt=Object.values(mm).reduce((x,y)=>x+y,0)||1;
   const low=S.products.filter(p=>p.stock<=10).sort((x,y)=>x.stock-y.stock);
   const recent=[...S.orders].sort((x,y)=>y.ts-x.ts).slice(0,6);
@@ -784,10 +844,13 @@ function vDashboard(){
    VIEW: POS
    ========================================================= */
 function cartTotals(){
-  let sub=0,qty=0;for(const [pid,q] of cart.lines){const p=lineInfo(pid);if(!p)continue;sub+=p.price*q;qty+=q}
-  const disc=Math.min(sub,cart.disc.type==='pct'?Math.round(sub*cart.disc.v/100):cart.disc.v);
-  const base=sub-disc;const tax=Math.round(base*(+S.settings.tax||0)/100);
-  return {sub,qty,disc,tax,total:base+tax};
+  let sub=0,qty=0,gc=0;for(const [pid,q] of cart.lines){const p=lineInfo(pid);if(!p)continue;sub+=p.price*q;qty+=q;if(p.gc)gc+=p.price*q}
+  const goods=sub-gc;
+  const disc=Math.min(goods,cart.disc.type==='pct'?Math.round(goods*cart.disc.v/100):cart.disc.v);
+  const base=goods-disc;const tax=Math.round(base*(+S.settings.tax||0)/100);
+  const total=base+tax+gc;
+  let redeem=0;const rv=cart.redeem&&gcById(cart.redeem);if(rv)redeem=Math.min(rv.balance,base+tax);
+  return {sub,qty,disc,tax,gc,goods,total,redeem,due:total-redeem};
 }
 function vPOS(){
   const q=UI.posQ.trim().toLowerCase();
@@ -798,13 +861,14 @@ function vPOS(){
     <div class="pos-left">
       <div class="pos-bar">
         <div class="input-wrap">${ic('search')}<input class="input" id="pos-q" placeholder="Tìm món… (nhấn /)" value="${esc(UI.posQ)}" autocomplete="off"></div>
+        <button class="btn" data-act="gc-sell">${ic('gift')}<span class="hide-sm">Thẻ quà tặng</span></button>
         <button class="btn" data-act="product-new">${ic('plus')}<span class="hide-sm">Món mới</span></button>
       </div>
       <div class="chips">${[{id:'all',name:'Tất cả'},...S.categories].map(c=>`<button class="chip ${UI.posCat===c.id?'on':''}" data-act="pos-cat" data-v="${c.id}">${esc(c.name)}<span class="c">${cnt(c.id)}</span></button>`).join('')}</div>
       <div class="products" id="products">${list.length?list.map(prodTile).join(''):`<div class="empty" style="grid-column:1/-1">${ic('search',32)}Không tìm thấy món nào</div>`}</div>
     </div>
     <aside class="cart" id="cart">${cartHtml()}</aside>
-    <button class="cart-fab" data-act="cart-open" id="cart-fab" ${T.qty?'':'style="display:none"'}>${ic('bag',20)}<span class="n">${T.qty}</span>Xem giỏ hàng<span class="t num">${money(T.total)}</span></button>
+    <button class="cart-fab" data-act="cart-open" id="cart-fab" ${T.qty?'':'style="display:none"'}>${ic('bag',20)}<span class="n">${T.qty}</span>Xem giỏ hàng<span class="t num">${money(T.due)}</span></button>
   </div>`;
 }
 function prodTile(p){
@@ -820,67 +884,76 @@ function cartHtml(){
   return `<div class="cart-h"><button class="icon-btn sm cart-close" data-act="cart-close" aria-label="Đóng giỏ hàng" style="display:none">${ic('back')}</button><h3>Đơn hàng hiện tại</h3><span class="pill accent">${T.qty} món</span><div style="flex:1"></div>${T.qty?`<button class="btn sm ghost danger" data-act="cart-clear">Xoá hết</button>`:''}</div>
   <button class="cart-cust ${c?'set':''}" data-act="cart-cust">${c?`<div class="avatar" style="background:${avColor(c.id)}">${esc(initials(c.name))}</div><div style="flex:1;min-width:0"><div class="cell-main">${esc(c.name)}</div><div class="cell-sub">${esc(c.phone)}</div></div>${ic('x',16)}`:`${ic('user')}<span style="flex:1">Thêm khách hàng</span>${ic('plus',16)}`}</button>
   ${cart.booking?`<div class="cart-cust set" style="cursor:default">${ic('calendar')}<span style="flex:1">Thu tiền cho lịch hẹn</span></div>`:''}
-  <div class="cart-lines">${T.qty?[...cart.lines].map(([pid,q])=>{const p=lineInfo(pid);if(!p)return '';return `<div class="line"><div><div class="nm">${esc(p.name)}</div><div class="unit num">${p.svc?'Dịch vụ · ':''}${money(p.price)}</div></div><div class="tot num">${money(p.price*q)}</div><div class="stepper"><button data-act="dec" data-v="${pid}" aria-label="Bớt">${ic(q===1?'trash':'minus',15)}</button><span class="num">${q}</span><button data-act="inc" data-v="${pid}" aria-label="Thêm">${ic('plus',15)}</button></div></div>`}).join(''):`<div class="empty">${ic('bag',40,1.4)}<div style="font-weight:600;color:var(--text-2)">Giỏ hàng trống</div><div>Chọn món bên trái để bắt đầu</div></div>`}</div>
+  <div class="cart-lines">${T.qty?[...cart.lines].map(([pid,q])=>{const p=lineInfo(pid);if(!p)return '';if(p.gc){const g=cart.gcNew[pid];return `<div class="line"><div><div class="nm row" style="gap:6px">${ic('gift',15)}${esc(p.name)}</div><div class="unit">${g.to?'Tặng '+esc(g.to)+' · ':''}không áp dụng giảm giá</div></div><div class="tot num">${money(p.price)}</div><button class="btn sm ghost danger" data-act="dec" data-v="${pid}" style="justify-self:start">${ic('trash',15)}Bỏ</button></div>`}return `<div class="line"><div><div class="nm">${esc(p.name)}</div><div class="unit num">${p.svc?'Dịch vụ · ':''}${money(p.price)}</div></div><div class="tot num">${money(p.price*q)}</div><div class="stepper"><button data-act="dec" data-v="${pid}" aria-label="Bớt">${ic(q===1?'trash':'minus',15)}</button><span class="num">${q}</span><button data-act="inc" data-v="${pid}" aria-label="Thêm">${ic('plus',15)}</button></div></div>`}).join(''):`<div class="empty">${ic('bag',40,1.4)}<div style="font-weight:600;color:var(--text-2)">Giỏ hàng trống</div><div>Chọn món bên trái để bắt đầu</div></div>`}</div>
   <div class="cart-foot">
     <div class="sum-row"><span>Tạm tính</span><span class="num">${money(T.sub)}</span></div>
     <div class="sum-row"><button class="link" data-act="cart-disc" ${T.qty?'':'disabled'}>${T.disc?'Giảm giá'+(cart.disc.type==='pct'?` (${cart.disc.v}%)`:''):'+ Thêm giảm giá'}</button><span class="num">${T.disc?'−'+money(T.disc):''}</span></div>
     ${T.tax?`<div class="sum-row"><span>VAT (${S.settings.tax}%)</span><span class="num">${money(T.tax)}</span></div>`:''}
-    <div class="sum-row total"><span>Tổng cộng</span><span class="num">${money(T.total)}</span></div>
-    <button class="btn primary lg block" data-act="checkout" ${T.qty?'':'disabled'}>Thanh toán ${T.qty?'· '+money(T.total):''}</button>
+    ${T.goods>0||cart.redeem?`<div class="sum-row"><button class="link" data-act="gc-redeem">${cart.redeem?'Thẻ quà tặng '+esc(gcById(cart.redeem)?.code.slice(-4)||''):'+ Dùng thẻ quà tặng'}</button><span class="num">${T.redeem?'−'+money(T.redeem):''}</span></div>`:''}
+    <div class="sum-row total"><span>${T.redeem?'Còn phải trả':'Tổng cộng'}</span><span class="num">${money(T.due)}</span></div>
+    <button class="btn primary lg block" data-act="checkout" ${T.qty?'':'disabled'}>${T.qty&&!T.due?'Hoàn tất bằng thẻ quà tặng':'Thanh toán '+(T.qty?'· '+money(T.due):'')}</button>
   </div>`;
 }
 function refreshPOS(bumpId){
   const T=cartTotals();
   const cartEl=$('#cart');if(cartEl){const open=cartEl.classList.contains('open');cartEl.innerHTML=cartHtml();if(open)$('.cart-close',cartEl).style.display=''}
   const pr=$('#products');if(pr){const q=UI.posQ.trim().toLowerCase();const list=S.products.filter(p=>(UI.posCat==='all'||p.cat===UI.posCat)&&(!q||p.name.toLowerCase().includes(q)));pr.innerHTML=list.length?list.map(prodTile).join(''):`<div class="empty" style="grid-column:1/-1">${ic('search',32)}Không tìm thấy món nào</div>`;if(bumpId){const b=pr.querySelector(`[data-v="${bumpId}"]`);b&&b.classList.add('bump')}}
-  const fab=$('#cart-fab');if(fab){fab.style.display=T.qty?'':'none';fab.innerHTML=`${ic('bag',20)}<span class="n">${T.qty}</span>Xem giỏ hàng<span class="t num">${money(T.total)}</span>`}
+  const fab=$('#cart-fab');if(fab){fab.style.display=T.qty?'':'none';fab.innerHTML=`${ic('bag',20)}<span class="n">${T.qty}</span>Xem giỏ hàng<span class="t num">${money(T.due)}</span>`}
 }
 function addToCart(pid){const p=lineInfo(pid);if(!p)return;const q=cart.lines.get(pid)||0;if(q>=p.stock){toast('Chỉ còn '+p.stock+' '+p.name,'alert');return}cart.lines.set(pid,q+1);refreshPOS(pid)}
 
 function openCheckout(){
   const T=cartTotals();if(!T.qty)return;
   const st={method:'cash',given:0,done:null};
-  const quick=()=>{const t=T.total;const set=new Set([t]);for(const u of [10000,50000,100000,200000,500000]){const v=Math.ceil(t/u)*u;if(v>t)set.add(v)}return [...set].sort((a,b)=>a-b).slice(0,4)};
+  const quick=()=>{const t=T.due;const set=new Set([t]);for(const u of [10000,50000,100000,200000,500000]){const v=Math.ceil(t/u)*u;if(v>t)set.add(v)}return [...set].sort((a,b)=>a-b).slice(0,4)};
   const body=()=>{
     if(st.done)return receiptView(st.done,true);
-    const m=st.method;const change=st.given-T.total;
+    const m=st.method;const change=st.given-T.due;
+    if(!T.due)return `<div class="modal-h"><h3>Thanh toán</h3><button class="icon-btn" data-act="close" aria-label="Đóng">${ic('x')}</button></div>
+    <div class="modal-b"><div class="due"><div class="lbl">Trừ vào thẻ quà tặng</div><div class="amt num">${money(T.redeem)}</div><div class="muted">Thẻ ${esc(gcById(cart.redeem).code)} · còn lại ${money(gcById(cart.redeem).balance-T.redeem)}</div></div></div>
+    <div class="modal-f"><button class="btn" data-act="close">Huỷ</button><button class="btn primary" id="pay-ok">${ic('check')}Xác nhận</button></div>`;
     return `<div class="modal-h"><h3>Thanh toán</h3><button class="icon-btn" data-act="close" aria-label="Đóng">${ic('x')}</button></div>
     <div class="modal-b">
-      <div class="due"><div class="lbl">Khách cần trả</div><div class="amt num">${money(T.total)}</div><div class="muted">${T.qty} món${cart.cust?' · '+esc(custById(cart.cust).name):''}</div></div>
-      <div class="pay-methods">${Object.entries(METHODS).map(([k,x])=>`<button class="pm ${m===k?'on':''}" data-pm="${k}">${ic(x.icon,22)}${x.label}</button>`).join('')}</div>
+      <div class="due"><div class="lbl">Khách cần trả</div><div class="amt num">${money(T.due)}</div><div class="muted">${T.qty} món${cart.cust?' · '+esc(custById(cart.cust).name):''}${T.redeem?' · đã trừ thẻ quà tặng '+money(T.redeem):''}</div></div>
+      <div class="pay-methods">${Object.entries(METHODS).filter(([k])=>PAY_METHODS.includes(k)).map(([k,x])=>`<button class="pm ${m===k?'on':''}" data-pm="${k}">${ic(x.icon,22)}${x.label}</button>`).join('')}</div>
       ${m==='cash'?`<div class="field"><label for="given">Tiền khách đưa</label><input class="input num" id="given" inputmode="numeric" placeholder="0" value="${st.given?NF.format(st.given):''}" style="height:48px;font-size:18px;font-weight:650"></div>
-        <div class="quick">${quick().map(v=>`<button class="btn sm" data-q="${v}">${v===T.total?'Đủ tiền':compact(v)}</button>`).join('')}</div>
+        <div class="quick">${quick().map(v=>`<button class="btn sm" data-q="${v}">${v===T.due?'Đủ tiền':compact(v)}</button>`).join('')}</div>
         <div class="change ${change<0&&st.given?'neg':''}" id="change" ${st.given?'':'style="display:none"'}><span>${change<0?'Còn thiếu':'Tiền thối lại'}</span><span class="num">${money(Math.abs(change))}</span></div>`
-      :m==='qr'?`<div class="qr-box">${qrSvg(T.total)}<div style="text-align:center"><div class="cell-main">${esc(S.settings.bank||'Chưa cài tài khoản')}</div><div class="cell-sub">Mã QR minh hoạ · kết nối VietQR khi triển khai thật</div></div></div>`
+      :m==='qr'?`<div class="qr-box">${qrSvg(T.due)}<div style="text-align:center"><div class="cell-main">${esc(S.settings.bank||'Chưa cài tài khoản')}</div><div class="cell-sub">Mã QR minh hoạ · kết nối VietQR khi triển khai thật</div></div></div>`
       :m==='card'?`<div class="empty" style="padding:20px">${ic('card',40,1.4)}<div style="color:var(--text-2);font-weight:600">Quẹt / chạm thẻ trên máy POS</div><div>Bấm xác nhận khi máy báo giao dịch thành công</div></div>`
       :`<div class="empty" style="padding:20px">${ic('wallet',40,1.4)}<div style="color:var(--text-2);font-weight:600">Khách quét mã ví (MoMo, ZaloPay, ShopeePay…)</div><div>Bấm xác nhận khi đã nhận tiền</div></div>`}
     </div>
-    <div class="modal-f"><button class="btn" data-act="close">Huỷ</button><button class="btn primary" id="pay-ok" ${m==='cash'&&st.given&&st.given<T.total?'disabled':''}>${ic('check')}Xác nhận đã thu ${money(T.total)}</button></div>`;
+    <div class="modal-f"><button class="btn" data-act="close">Huỷ</button><button class="btn primary" id="pay-ok" ${m==='cash'&&st.given&&st.given<T.due?'disabled':''}>${ic('check')}Xác nhận đã thu ${money(T.due)}</button></div>`;
   };
   const el=openModal(body(),'');
   const rerender=()=>{el.innerHTML=body();bind()};
   function bind(){
     el.querySelectorAll('[data-pm]').forEach(b=>b.onclick=()=>{st.method=b.dataset.pm;rerender()});
     el.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{st.given=+b.dataset.q;rerender()});
-    const g=$('#given',el);if(g){g.oninput=()=>{const v=+g.value.replace(/\D/g,'');st.given=v;g.value=v?NF.format(v):'';const ch=$('#change',el);const c=v-T.total;ch.style.display=v?'':'none';ch.className='change'+(c<0?' neg':'');ch.innerHTML=`<span>${c<0?'Còn thiếu':'Tiền thối lại'}</span><span class="num">${money(Math.abs(c))}</span>`;$('#pay-ok',el).disabled=v>0&&v<T.total};setTimeout(()=>g.focus(),50);g.onkeydown=e=>{if(e.key==='Enter'&&!$('#pay-ok',el).disabled)$('#pay-ok',el).click()}}
-    const ok=$('#pay-ok',el);if(ok)ok.onclick=()=>{st.done=completeSale(st.method,st.method==='cash'?(st.given||T.total):T.total);rerender()};
+    const g=$('#given',el);if(g){g.oninput=()=>{const v=+g.value.replace(/\D/g,'');st.given=v;g.value=v?NF.format(v):'';const ch=$('#change',el);const c=v-T.due;ch.style.display=v?'':'none';ch.className='change'+(c<0?' neg':'');ch.innerHTML=`<span>${c<0?'Còn thiếu':'Tiền thối lại'}</span><span class="num">${money(Math.abs(c))}</span>`;$('#pay-ok',el).disabled=v>0&&v<T.due};setTimeout(()=>g.focus(),50);g.onkeydown=e=>{if(e.key==='Enter'&&!$('#pay-ok',el).disabled)$('#pay-ok',el).click()}}
+    const ok=$('#pay-ok',el);if(ok)ok.onclick=()=>{st.done=completeSale(T.due?st.method:'gift',st.method==='cash'&&T.due?(st.given||T.due):T.due);rerender()};
   }
   bind();
 }
 function completeSale(method,given){
   const T=cartTotals();
-  const items=[...cart.lines].map(([pid,q])=>{const p=lineInfo(pid);if(!p)return null;if(!p.svc)p.stock=Math.max(0,p.stock-q);return {p:pid,n:p.name,q,pr:p.price,c:p.cost}}).filter(Boolean);
-  const o={id:uid(),no:S.seq++,ts:Date.now(),items,sub:T.sub,disc:T.disc,tax:T.tax,total:T.total,method,cust:cart.cust,status:'paid',note:cart.note,given};
+  const now=Date.now();const oid=uid();const sold=[];
+  const items=[...cart.lines].map(([pid,q])=>{const p=lineInfo(pid);if(!p)return null;
+    if(p.gc){const g=cart.gcNew[pid];const v={id:'g'+uid(),code:gcCode(),amount:g.amount,balance:g.amount,cust:cart.cust,to:g.to,msg:g.msg,design:g.design,created:now,expires:now+(+S.settings.gcMonths||12)*30.44*DAY,status:'active',order:oid,log:[{ts:now,type:'issue',amt:g.amount,order:oid}]};S.vouchers.push(v);sold.push(v.id);return {p:'gc:'+v.id,n:'Thẻ quà tặng '+v.code,q:1,pr:g.amount,c:0}}
+    if(!p.svc)p.stock=Math.max(0,p.stock-q);return {p:pid,n:p.name,q,pr:p.price,c:p.cost}}).filter(Boolean);
+  const o={id:oid,no:S.seq++,ts:now,items,sub:T.sub,disc:T.disc,tax:T.tax,total:T.total,method,cust:cart.cust,status:'paid',note:cart.note,given,gcSold:T.gc,soldVouchers:sold};
+  if(T.redeem){const v=gcById(cart.redeem);v.balance-=T.redeem;v.log.push({ts:now,type:'redeem',amt:T.redeem,order:oid});o.gift={vid:v.id,code:v.code,amt:T.redeem}}
   S.orders.push(o);
   if(cart.booking){const b=S.bookings.find(x=>x.id===cart.booking);if(b){b.status='done';b.order=o.id}}
   save();
-  cart.lines.clear();cart.cust=null;cart.disc={type:'pct',v:0};cart.note='';cart.booking=null;
+  cart.lines.clear();cart.cust=null;cart.disc={type:'pct',v:0};cart.note='';cart.booking=null;cart.gcNew={};cart.redeem=null;
   refreshPOS();const ce=$('#cart');ce&&ce.classList.remove('open');
   return o;
 }
 function receiptView(o,fresh){
   const c=custById(o.cust);
-  return `${fresh?`<div class="modal-h"><div style="flex:1"></div><button class="icon-btn" data-act="close" aria-label="Đóng">${ic('x')}</button></div><div class="modal-b" style="padding-top:0"><div class="success"><div class="ring">${ic('check',36,2.4)}</div><h3 style="margin:0;font-size:20px">Thanh toán thành công</h3><div class="muted">Đơn #${o.no} · ${METHODS[o.method].label}${o.method==='cash'&&o.given>o.total?' · Thối lại '+money(o.given-o.total):''}</div></div>`:'<div>'}
+  return `${fresh?`<div class="modal-h"><div style="flex:1"></div><button class="icon-btn" data-act="close" aria-label="Đóng">${ic('x')}</button></div><div class="modal-b" style="padding-top:0"><div class="success"><div class="ring">${ic('check',36,2.4)}</div><h3 style="margin:0;font-size:20px">Thanh toán thành công</h3><div class="muted">Đơn #${o.no} · ${METHODS[o.method].label}${o.method==='cash'&&o.given>(o.total-(o.gift?o.gift.amt:0))?' · Thối lại '+money(o.given-(o.total-(o.gift?o.gift.amt:0))):''}</div></div>
+  ${(o.soldVouchers||[]).map(id=>{const v=gcById(id);return v?`<div style="margin-top:14px">${gcCardHtml(v)}<div class="row" style="margin-top:8px"><button class="btn sm" data-act="gc-copy-msg" data-v="${v.id}">${ic('copy',15)}Sao chép tin nhắn gửi khách</button><button class="btn sm ghost" data-act="gc-open" data-v="${v.id}">Xem thẻ</button></div></div>`:''}).join('')}`:'<div>'}
   <div class="receipt" id="print-area">
     <div class="c" style="font-weight:700;font-size:14px">${esc(S.settings.store)}</div>
     <div class="c">${esc(S.settings.address)}</div><div class="c">${esc(S.settings.phone)}</div>
@@ -890,7 +963,8 @@ function receiptView(o,fresh){
     ${o.disc?`<div class="r"><span>Giảm giá</span><span>-${NF.format(o.disc)}</span></div>`:''}
     ${o.tax?`<div class="r"><span>VAT</span><span>${NF.format(o.tax)}</span></div>`:''}
     <div class="r" style="font-weight:700;font-size:14px"><span>TỔNG</span><span>${money(o.total)}</span></div>
-    <div class="r"><span>${METHODS[o.method].label}</span><span>${NF.format(o.given||o.total)}</span></div>
+    ${o.gift?`<div class="r"><span>Thẻ quà tặng ${esc(o.gift.code)}</span><span>${NF.format(o.gift.amt)}</span></div>`:''}
+    ${o.method!=='gift'?`<div class="r"><span>${METHODS[o.method].label}</span><span>${NF.format(o.given||(o.total-(o.gift?o.gift.amt:0)))}</span></div>`:''}
     ${o.status!=='paid'?'<div class="c" style="font-weight:700;margin-top:6px">*** ĐÃ HOÀN TIỀN ***</div>':''}
     <hr><div class="c">Cảm ơn quý khách & hẹn gặp lại!</div>
   </div></div>
@@ -1073,7 +1147,7 @@ function vReports(){
   const B=bounds(UI.rRange);const cur=ordersBetween(B.start,B.end),prev=ordersBetween(B.prevStart,B.prevEnd);
   const a=summarize(cur),b=summarize(prev);
   // categories
-  const cm={};for(const o of cur){if(!isPaid(o))continue;const f=o.sub?o.total/o.sub:1;for(const i of o.items){const p=prodById(i.p);const k=p?p.cat:String(i.p).startsWith('svc:')?'svc':'other';cm[k]=(cm[k]||0)+i.q*i.pr*f}}
+  const cm={};for(const o of cur){if(!isPaid(o))continue;const f=o.sub?o.total/o.sub:1;for(const i of o.items){if(isGcItem(i))continue;const p=prodById(i.p);const k=p?p.cat:String(i.p).startsWith('svc:')?'svc':'other';cm[k]=(cm[k]||0)+i.q*i.pr*f}}
   const cats=Object.entries(cm).sort((x,y)=>y[1]-x[1]);const cmax=cats[0]?cats[0][1]:1;
   // heatmap weekday x hour
   const H0=7,H1=21;const heat=Array.from({length:7},()=>Array(H1-H0+1).fill(0));
@@ -1081,7 +1155,7 @@ function vReports(){
   const hmax=Math.max(1,...heat.flat());
   const WDO=['T2','T3','T4','T5','T6','T7','CN'];
   // products table
-  const pm={};for(const o of cur){if(!isPaid(o))continue;for(const i of o.items){const r=pm[i.p]=pm[i.p]||{n:i.n,q:0,v:0,c:0};r.q+=i.q;r.v+=i.q*i.pr;r.c+=i.q*(i.c||0)}}
+  const pm={};for(const o of cur){if(!isPaid(o))continue;for(const i of o.items){if(isGcItem(i))continue;const r=pm[i.p]=pm[i.p]||{n:i.n,q:0,v:0,c:0};r.q+=i.q;r.v+=i.q*i.pr;r.c+=i.q*(i.c||0)}}
   const prods=Object.entries(pm).sort((x,y)=>y[1].v-x[1].v);
   const card=(l,v,cv,pv,neg)=>`<div class="card kpi"><div class="lbl">${l}</div><div class="val num" style="font-size:22px">${v}</div><div class="foot">${pv===undefined?'':deltaHtml(cv,pv,neg)}</div></div>`;
   return `<div class="hello"><div><h2>Báo cáo bán hàng</h2><p>${fDateY(B.start)} – ${fDateY(B.end)}</p></div>
@@ -1122,11 +1196,12 @@ function vSettings(){
         <div class="field"><label for="s-phone">Số điện thoại</label><input class="input" id="s-phone" data-set="phone" value="${esc(s.phone)}"></div>
         <div class="field"><label for="s-tax">Thuế VAT (%)</label><input class="input num" id="s-tax" data-set="tax" type="number" min="0" max="20" value="${s.tax}"><span class="hint">Để 0 nếu giá đã gồm thuế</span></div>
         <div class="field span2"><label for="s-bank">Tài khoản nhận chuyển khoản</label><input class="input" id="s-bank" data-set="bank" value="${esc(s.bank||'')}" placeholder="Ngân hàng · Số tài khoản"><span class="hint">Hiển thị trên màn hình thanh toán QR</span></div>
+        <div class="field"><label for="s-gcm">Hạn dùng thẻ quà tặng (tháng)</label><input class="input num" id="s-gcm" data-set="gcMonths" type="number" min="1" max="60" value="${s.gcMonths||12}"></div>
       </div></div>
       <div class="card"><div class="card-h"><h3>Giao diện</h3></div><div class="card-b"><div class="seg">${[['auto','Theo hệ thống'],['light','Sáng'],['dark','Tối']].map(([k,v])=>`<button data-act="set-theme" data-v="${k}" class="${s.theme===k?'on':''}">${v}</button>`).join('')}</div></div></div>
     </div>
     <div class="stack">
-      <div class="card"><div class="card-h"><h3>Phím tắt</h3></div><div class="card-b">${kb('Ctrl K','Tìm kiếm nhanh')}${kb('1 – 8','Chuyển trang')}${kb('/','Tìm món (trang Bán hàng)')}${kb('Esc','Đóng cửa sổ')}</div></div>
+      <div class="card"><div class="card-h"><h3>Phím tắt</h3></div><div class="card-b">${kb('Ctrl K','Tìm kiếm nhanh')}${kb('1 – 9','Chuyển trang')}${kb('/','Tìm món (trang Bán hàng)')}${kb('Esc','Đóng cửa sổ')}</div></div>
       <div class="card"><div class="card-h"><h3>Dữ liệu</h3></div><div class="card-b stack" style="gap:10px">
         <div class="muted">Dữ liệu lưu trên trình duyệt này (${NF.format(S.orders.length)} đơn, ${S.products.length} món, ${S.customers.length} khách).</div>
         <button class="btn" data-act="export-json">${ic('download')}Sao lưu (JSON)</button>
@@ -1272,7 +1347,91 @@ function vPublic(){
   </div>`;
 }
 
-const VIEWS={'dat-lich':vPublic,'lich-hen':vBookings,'tong-quan':vDashboard,'ban-hang':vPOS,'don-hang':vOrders,'san-pham':vProducts,'khach-hang':vCustomers,'bao-cao':vReports,'cai-dat':vSettings};
+/* =========================================================
+   VIEW: GIFT CARDS
+   ========================================================= */
+function vGiftCards(){
+  const now=Date.now();const all=S.vouchers;
+  const live=all.filter(v=>v.status!=='void'&&v.expires>now&&v.balance>0);
+  const liability=live.reduce((a,v)=>a+v.balance,0);
+  const since=now-30*DAY;const sold30=all.filter(v=>v.created>=since);const soldAmt=sold30.reduce((a,v)=>a+v.amount,0);
+  const issued=all.filter(v=>v.status!=='void').reduce((a,v)=>a+v.amount,0);
+  const used=all.filter(v=>v.status!=='void').reduce((a,v)=>a+(v.amount-v.balance),0);
+  const extra=S.orders.filter(o=>o.gift&&isPaid(o)&&o.ts>=since);const upsell=extra.reduce((a,o)=>a+Math.max(0,o.total-(o.gcSold||0)-o.gift.amt),0);
+  const soon=live.filter(v=>v.expires-now<30*DAY);
+  const q=gcNorm(UI.gQ);const qt=UI.gQ.trim().toLowerCase();
+  const list=all.filter(v=>{const st=gcState(v).k;if(UI.gF==='active'&&!(st==='new'||st==='partial'))return false;if(UI.gF==='used'&&st!=='used')return false;if(UI.gF==='expired'&&!(st==='expired'||st==='void'))return false;if(!qt)return true;const c=custById(v.cust);return gcNorm(v.code).includes(q)||(v.to||'').toLowerCase().includes(qt)||(c&&(c.name.toLowerCase().includes(qt)||c.phone.includes(qt)))}).sort((a,b)=>b.created-a.created);
+  return `<div class="hello"><div><h2>Thẻ quà tặng</h2><p>Bán thẻ tại quầy, khách dùng mã để trả tiền. Doanh thu chỉ được tính khi thẻ được dùng.</p></div>
+  <div class="row"><button class="btn" data-act="gc-check">${ic('search')}Kiểm tra số dư</button><button class="btn primary" data-act="gc-sell">${ic('plus')}Bán thẻ mới</button></div></div>
+  <div class="kpis">
+    <div class="card kpi"><div class="lbl">${ic('gift',16)}Đã bán (30 ngày)</div><div class="val num">${money(soldAmt)}</div><div class="foot">${sold30.length} thẻ</div></div>
+    <div class="card kpi"><div class="lbl">${ic('wallet',16)}Số dư chưa dùng</div><div class="val num">${money(liability)}</div><div class="foot">${live.length} thẻ còn hiệu lực · là tiền quán đang “nợ” khách</div></div>
+    <div class="card kpi"><div class="lbl">${ic('check',16)}Tỉ lệ đã dùng</div><div class="val num">${issued?Math.round(used/issued*100):0}%</div><div class="foot">${money(used)} / ${money(issued)}</div></div>
+    <div class="card kpi"><div class="lbl">${ic('up',16)}Khách trả thêm</div><div class="val num">${money(upsell)}</div><div class="foot">Ngoài số tiền trên thẻ · 30 ngày</div></div>
+  </div>
+  ${soon.length?`<div class="alert-row" style="margin-bottom:16px">${ic('alert',16)}${soon.length} thẻ sắp hết hạn trong 30 ngày (còn ${money(soon.reduce((a,v)=>a+v.balance,0))}). Nhắn khách quay lại dùng nhé.</div>`:''}
+  <div class="toolbar"><div class="input-wrap" style="flex:1;min-width:200px">${ic('search')}<input class="input" id="g-q" placeholder="Mã thẻ, người nhận, người mua…" value="${esc(UI.gQ)}" autocomplete="off"></div>
+  <div class="seg">${[['all','Tất cả'],['active','Còn dùng được'],['used','Đã dùng hết'],['expired','Hết hạn / huỷ']].map(([k,v])=>`<button data-act="g-filter" data-v="${k}" class="${UI.gF===k?'on':''}">${v}</button>`).join('')}</div></div>
+  <div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Thẻ</th><th class="hide-sm">Người nhận</th><th class="hide-sm">Người mua</th><th class="r">Số dư</th><th class="r hide-sm">Hạn dùng</th><th>Trạng thái</th></tr></thead><tbody>
+  ${list.length?list.map(v=>{const st=gcState(v);const c=custById(v.cust);return `<tr class="click" data-act="gc-open" data-v="${v.id}"><td><div class="row"><div class="gc-mini" style="background:${GC_DESIGNS[v.design]}">${ic('gift',14,2)}</div><div><div class="cell-main num" style="font-family:var(--mono);letter-spacing:.03em">${esc(v.code)}</div><div class="cell-sub">Bán ${fDateY(v.created)}</div></div></div></td><td class="hide-sm">${esc(v.to||'—')}</td><td class="hide-sm">${c?esc(c.name):'<span class="muted">Khách lẻ</span>'}</td><td class="r"><div class="cell-main num">${money(v.balance)}</div><div class="cell-sub num">/ ${money(v.amount)}</div><div class="bar" style="width:90px;margin-left:auto"><i style="width:${(v.balance/v.amount*100).toFixed(0)}%;background:var(--amber)"></i></div></td><td class="r hide-sm num ${st.k==='expired'?'':'muted'}">${fDateY(v.expires)}</td><td><span class="pill ${st.cls}">${st.label}</span></td></tr>`}).join(''):`<tr><td colspan="6"><div class="empty">${ic('gift',36,1.4)}Chưa có thẻ nào khớp bộ lọc</div></td></tr>`}
+  </tbody></table></div></div>`;
+}
+const gcMessage=v=>`🎁 ${v.to?'Gửi '+v.to+': ':''}Bạn nhận được thẻ quà tặng ${money(v.amount)} tại ${S.settings.store}!${v.msg?'\n"'+v.msg+'"':''}\nMã thẻ: ${v.code}\nHạn dùng: ${fDateY(v.expires)}\nĐọc mã này cho nhân viên khi thanh toán. Địa chỉ: ${S.settings.address}`;
+function copyText(t,okMsg){const done=()=>toast(okMsg);if(navigator.clipboard)navigator.clipboard.writeText(t).then(done,()=>fallback());else fallback();function fallback(){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){toast('Không sao chép được, hãy chép tay','alert')}a.remove()}}
+function openGiftCard(id){
+  const v=gcById(id);if(!v)return;const st=gcState(v);const c=custById(v.cust);
+  const TYPES={issue:'Phát hành',redeem:'Thanh toán',void:'Huỷ thẻ',refund:'Hoàn lại số dư',extend:'Gia hạn'};
+  openDrawer(`<div class="modal-h"><div><h3>Thẻ quà tặng</h3><div class="muted">Bán ${fDayLong(v.created)}</div></div><button class="icon-btn" data-act="close" aria-label="Đóng">${ic('x')}</button></div>
+  <div class="modal-b stack">
+    ${gcCardHtml(v,true)}
+    <div class="row"><span class="pill ${st.cls}">${st.label}</span><span class="muted">Số dư</span><b class="num" style="font-size:18px;margin-left:auto">${money(v.balance)}</b></div>
+    <div class="row" style="flex-wrap:wrap"><button class="btn sm" data-act="gc-copy" data-v="${v.id}">${ic('copy',15)}Sao chép mã</button><button class="btn sm" data-act="gc-copy-msg" data-v="${v.id}">${ic('copy',15)}Tin nhắn gửi khách (Zalo)</button></div>
+    ${v.msg?`<div style="padding:12px 14px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);font-style:italic">“${esc(v.msg)}”</div>`:''}
+    <div class="card" style="padding:16px;box-shadow:none"><dl class="dl"><dt>Mệnh giá</dt><dd class="num">${money(v.amount)}</dd><dt>Người nhận</dt><dd>${esc(v.to||'—')}</dd><dt>Người mua</dt><dd>${c?esc(c.name)+' · '+esc(c.phone):'Khách lẻ'}</dd><dt>Hạn dùng</dt><dd class="num">${fDateY(v.expires)}</dd></dl></div>
+    <div><div class="field"><label>Lịch sử</label></div><div class="list">${[...v.log].reverse().map(l=>{const o=l.order&&S.orders.find(x=>x.id===l.order);return `<div class="list-item"><div class="grow"><div class="cell-main">${TYPES[l.type]||l.type}${o?` · <button class="link" data-act="order" data-v="${o.id}">Đơn #${o.no}</button>`:''}</div><div class="cell-sub">${fDT(l.ts)}</div></div><span class="num" style="font-weight:650;color:${l.type==='redeem'||l.type==='void'?'var(--red)':'var(--green)'}">${l.type==='extend'?'':(l.type==='redeem'||l.type==='void'?'−':'+')+money(l.amt)}</span></div>`}).join('')}</div></div>
+    ${v.status!=='void'?`<div class="row" style="border-top:1px solid var(--line);padding-top:14px;flex-wrap:wrap">${v.balance>0?`<button class="btn" data-act="gc-use" data-v="${v.id}">${ic('bag')}Dùng thẻ cho đơn mới</button>`:''}<button class="btn ghost" data-act="gc-extend" data-v="${v.id}">${ic('calendar')}Gia hạn 3 tháng</button><div style="flex:1"></div>${v.balance>0?`<button class="btn ghost danger" data-act="gc-void" data-v="${v.id}">${ic('trash')}Huỷ thẻ</button>`:''}</div>`:''}
+  </div>`);
+}
+function openGiftSell(){
+  const g={amount:200000,to:'',msg:'',design:'indigo'};
+  const preview=()=>gcCardHtml({...g,code:'',expires:Date.now()+(+S.settings.gcMonths||12)*30.44*DAY});
+  const el=openModal(`<div class="modal-h"><h3>Bán thẻ quà tặng</h3><button class="icon-btn" data-act="close" aria-label="Đóng">${ic('x')}</button></div>
+  <div class="modal-b gc-split">
+    <div id="gs-prev">${preview()}</div>
+    <div class="stack" style="gap:14px">
+      <div class="field"><label>Mệnh giá</label><div class="row" style="flex-wrap:wrap;gap:6px" id="gs-am">${GC_AMOUNTS.map(a=>`<button class="chip ${a===g.amount?'on':''}" data-a="${a}">${compact(a)}</button>`).join('')}</div><input class="input num" id="gs-custom" inputmode="numeric" placeholder="Hoặc nhập số tiền khác"></div>
+      <div class="field"><label>Mẫu thẻ</label><div class="swatches">${Object.entries(GC_DESIGNS).map(([k,bg])=>`<button class="swatch ${k===g.design?'on':''}" data-d="${k}" style="background:${bg}" aria-label="Mẫu ${k}"></button>`).join('')}</div></div>
+      <div class="field"><label for="gs-to">Tặng cho</label><input class="input" id="gs-to" placeholder="VD: Lan Anh" maxlength="40"></div>
+      <div class="field"><label for="gs-msg">Lời nhắn</label><input class="input" id="gs-msg" placeholder="VD: Chúc mừng sinh nhật!" maxlength="80"></div>
+    </div>
+  </div>
+  <div class="modal-f"><button class="btn" data-act="close">Huỷ</button><button class="btn primary" id="gs-ok">${ic('plus')}Thêm vào đơn · <span id="gs-amt">${money(g.amount)}</span></button></div>`,'wide');
+  const upd=()=>{$('#gs-prev',el).innerHTML=preview();$('#gs-amt',el).textContent=money(g.amount)};
+  el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{g.amount=+b.dataset.a;$('#gs-custom',el).value='';el.querySelectorAll('[data-a]').forEach(x=>x.classList.toggle('on',x===b));upd()});
+  el.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{g.design=b.dataset.d;el.querySelectorAll('[data-d]').forEach(x=>x.classList.toggle('on',x===b));upd()});
+  const cu=$('#gs-custom',el);cu.oninput=()=>{const v=+cu.value.replace(/\D/g,'');cu.value=v?NF.format(v):'';if(v){g.amount=v;el.querySelectorAll('[data-a]').forEach(x=>x.classList.remove('on'))}upd()};
+  $('#gs-to',el).oninput=e=>{g.to=e.target.value.trim();upd()};$('#gs-msg',el).oninput=e=>{g.msg=e.target.value.trim()};
+  $('#gs-ok',el).onclick=()=>{if(g.amount<10000)return toast('Mệnh giá tối thiểu 10.000 ₫','alert');const key='gc:'+uid();cart.gcNew[key]={...g};cart.lines.set(key,1);closeOverlay(true);if(route()==='ban-hang')refreshPOS();else go('ban-hang');toast('Đã thêm thẻ '+money(g.amount)+' vào đơn')};
+}
+function openGiftLookup(mode){
+  const el=openModal(`<div class="modal-h"><h3>${mode==='redeem'?'Dùng thẻ quà tặng':'Kiểm tra số dư thẻ'}</h3><button class="icon-btn" data-act="close" aria-label="Đóng">${ic('x')}</button></div>
+  <div class="modal-b stack"><div class="field"><label for="gl-code">Mã thẻ</label><input class="input" id="gl-code" placeholder="GC-XXXX-XXXX" autocomplete="off" style="height:48px;font-family:var(--mono);font-size:17px;letter-spacing:.06em;text-transform:uppercase"></div><div id="gl-res"></div></div>
+  <div class="modal-f">${mode==='redeem'&&cart.redeem?`<button class="btn danger" id="gl-rm" style="margin-right:auto">Bỏ thẻ khỏi đơn</button>`:''}<button class="btn" data-act="close">Đóng</button>${mode==='redeem'?`<button class="btn primary" id="gl-ok" disabled>Áp dụng</button>`:''}</div>`);
+  const inp=$('#gl-code',el);let found=null;
+  const check=()=>{const v=gcFind(inp.value);const r=$('#gl-res',el);found=null;
+    if(!gcNorm(inp.value)){r.innerHTML='<div class="muted">Nhập mã in trên thẻ hoặc trong tin nhắn của khách.</div>'}
+    else if(!v){r.innerHTML=`<div class="alert-row" style="background:var(--red-soft);color:var(--red)">${ic('alert',16)}Không tìm thấy thẻ với mã này</div>`}
+    else{const st=gcState(v);const ok=st.k==='new'||st.k==='partial';if(ok)found=v;
+      const T=cartTotals();const use=Math.min(v.balance,T.goods-T.disc+T.tax);
+      r.innerHTML=`${gcCardHtml(v)}<div class="row" style="margin-top:12px"><span class="pill ${st.cls}">${st.label}</span><span class="muted">Số dư</span><b class="num" style="margin-left:auto;font-size:18px">${money(v.balance)}</b></div>${!ok?`<div class="alert-row" style="margin-top:10px;background:var(--red-soft);color:var(--red)">${ic('alert',16)}Thẻ này không dùng được (${st.label.toLowerCase()})</div>`:mode==='redeem'?`<div class="change" style="margin-top:12px"><span>Trừ vào đơn này</span><span class="num">${money(use)}</span></div>${v.balance>use?`<div class="muted" style="margin-top:6px">Thẻ còn lại ${money(v.balance-use)} cho lần sau</div>`:T.goods-T.disc+T.tax>use?`<div class="muted" style="margin-top:6px">Khách trả thêm ${money(T.goods-T.disc+T.tax-use)} bằng cách khác</div>`:''}`:''}`}
+    const b=$('#gl-ok',el);if(b)b.disabled=!found};
+  inp.oninput=check;inp.onkeydown=e=>{if(e.key==='Enter'&&found&&mode==='redeem')$('#gl-ok',el).click()};check();inp.focus();
+  if(mode==='redeem'&&cart.redeem){inp.value=gcById(cart.redeem)?.code||'';check()}
+  const ok=$('#gl-ok',el);if(ok)ok.onclick=()=>{cart.redeem=found.id;closeOverlay();refreshPOS();toast('Đã áp dụng thẻ '+found.code)};
+  const rm=$('#gl-rm',el);if(rm)rm.onclick=()=>{cart.redeem=null;closeOverlay();refreshPOS()};
+}
+
+const VIEWS={'the-qua-tang':vGiftCards,'dat-lich':vPublic,'lich-hen':vBookings,'tong-quan':vDashboard,'ban-hang':vPOS,'don-hang':vOrders,'san-pham':vProducts,'khach-hang':vCustomers,'bao-cao':vReports,'cai-dat':vSettings};
 
 /* =========================================================
    OVERLAYS
@@ -1290,11 +1449,12 @@ function openPalette(){
   const build=()=>{
     const q=inp.value.trim().toLowerCase();items=[];
     const pages=ROUTES.filter(r=>!q||r.label.toLowerCase().includes(q)).map(r=>({g:'Trang',icon:r.icon,label:r.label,run:()=>go(r.id)}));
-    const acts=[{label:'Tạo đơn mới',icon:'plus',run:()=>go('ban-hang')},{label:'Tạo lịch hẹn',icon:'calendar',run:()=>openBookingForm()},{label:'Thêm món mới',icon:'box',run:()=>openProductForm()},{label:'Thêm khách hàng',icon:'user',run:()=>openCustomerForm()},{label:'Đổi giao diện sáng / tối',icon:'moon',run:toggleTheme}].filter(a=>!q||a.label.toLowerCase().includes(q)).map(a=>({g:'Thao tác',...a}));
+    const acts=[{label:'Tạo đơn mới',icon:'plus',run:()=>go('ban-hang')},{label:'Tạo lịch hẹn',icon:'calendar',run:()=>openBookingForm()},{label:'Bán thẻ quà tặng',icon:'gift',run:openGiftSell},{label:'Kiểm tra số dư thẻ quà tặng',icon:'search',run:()=>openGiftLookup('check')},{label:'Thêm món mới',icon:'box',run:()=>openProductForm()},{label:'Thêm khách hàng',icon:'user',run:()=>openCustomerForm()},{label:'Đổi giao diện sáng / tối',icon:'moon',run:toggleTheme}].filter(a=>!q||a.label.toLowerCase().includes(q)).map(a=>({g:'Thao tác',...a}));
     items.push(...acts,...pages);
     if(q){
       S.products.filter(p=>p.name.toLowerCase().includes(q)).slice(0,5).forEach(p=>items.push({g:'Món — Enter để thêm vào đơn',icon:'box',label:p.name,right:money(p.price),run:()=>{go('ban-hang');setTimeout(()=>addToCart(p.id),30)}}));
       S.customers.filter(c=>c.name.toLowerCase().includes(q)||c.phone.includes(q)).slice(0,5).forEach(c=>items.push({g:'Khách hàng',icon:'user',label:c.name,right:c.phone,run:()=>openCustomer(c.id)}));
+      const gq=gcNorm(q);if(gq.length>=3)S.vouchers.filter(v=>gcNorm(v.code).includes(gq)).slice(0,4).forEach(v=>items.push({g:'Thẻ quà tặng',icon:'gift',label:v.code,right:money(v.balance)+' còn lại',run:()=>openGiftCard(v.id)}));
       const n=q.replace(/^#/,'');if(/^\d+$/.test(n))S.orders.filter(o=>String(o.no).startsWith(n)).slice(-5).reverse().forEach(o=>items.push({g:'Đơn hàng',icon:'receipt',label:'#'+o.no,right:money(o.total)+' · '+fDate(o.ts),run:()=>openOrder(o.id)}));
     }
     sel=Math.min(sel,Math.max(0,items.length-1));
@@ -1342,15 +1502,23 @@ document.addEventListener('click',e=>{
     case 'pos-cat':UI.posCat=v;document.querySelectorAll('.chips .chip').forEach(c=>c.classList.toggle('on',c.dataset.v===v));refreshPOS();break;
     case 'add':addToCart(v);break;
     case 'inc':addToCart(v);break;
-    case 'dec':{const q=(cart.lines.get(v)||0)-1;if(q<=0)cart.lines.delete(v);else cart.lines.set(v,q);refreshPOS();break}
-    case 'cart-clear':cart.lines.clear();cart.disc={type:'pct',v:0};cart.cust=null;refreshPOS();break;
+    case 'dec':{const q=(cart.lines.get(v)||0)-1;if(q<=0){cart.lines.delete(v);delete cart.gcNew[v]}else cart.lines.set(v,q);refreshPOS();break}
+    case 'cart-clear':cart.lines.clear();cart.disc={type:'pct',v:0};cart.cust=null;cart.gcNew={};cart.redeem=null;cart.booking=null;refreshPOS();break;
     case 'cart-cust':if(cart.cust){cart.cust=null;refreshPOS()}else openCustomerPicker();break;
     case 'cart-disc':openDiscount();break;
     case 'cart-open':{const c=$('#cart');c.classList.add('open');$('.cart-close',c).style.display='';break}
     case 'cart-close':$('#cart').classList.remove('open');break;
     case 'checkout':openCheckout();break;
     case 'order':openOrder(v);break;
-    case 'refund':{const o=S.orders.find(x=>x.id===v);confirmBox('Hoàn tiền đơn #'+o.no+'?','Khách sẽ được hoàn '+money(o.total)+'. Số lượng món được cộng lại vào kho.','Hoàn tiền',()=>{o.status='refunded';for(const i of o.items){const p=prodById(i.p);if(p)p.stock+=i.q}save();render();openOrder(o.id);toast('Đã hoàn tiền đơn #'+o.no)});break}
+    case 'refund':{const o=S.orders.find(x=>x.id===v);
+      const sold=(o.soldVouchers||[]).map(gcById).filter(Boolean);
+      if(sold.some(g=>g.balance<g.amount&&g.status!=='void')){toast('Không hoàn được: thẻ quà tặng trong đơn đã được dùng','alert');break}
+      const g=o.gift?gcById(o.gift.vid):null;const cashBack=o.total-(o.gift?o.gift.amt:0);
+      const msg=(cashBack?'Khách được hoàn '+money(cashBack)+' bằng '+METHODS[o.method].label.toLowerCase()+'. ':'')+(g?money(o.gift.amt)+' được trả lại vào thẻ '+g.code+'. ':'')+(sold.length?sold.length+' thẻ quà tặng bán trong đơn sẽ bị huỷ. ':'')+'Số lượng món được cộng lại vào kho.';
+      confirmBox('Hoàn tiền đơn #'+o.no+'?',msg,'Hoàn tiền',()=>{const now=Date.now();o.status='refunded';for(const i of o.items){const p=prodById(i.p);if(p)p.stock+=i.q}
+        for(const x of sold){if(x.status!=='void'){x.log.push({ts:now,type:'void',amt:x.balance,order:o.id});x.status='void'}}
+        if(g){g.balance+=o.gift.amt;g.log.push({ts:now,type:'refund',amt:o.gift.amt,order:o.id})}
+        save();render();openOrder(o.id);toast('Đã hoàn tiền đơn #'+o.no)});break}
     case 'o-status':UI.oStatus=v;UI.oLimit=40;render();break;
     case 'o-more':UI.oLimit+=60;render();break;
     case 'p-cat':UI.pCat=v;render();break;
@@ -1366,6 +1534,17 @@ document.addEventListener('click',e=>{
     case 'reset-demo':confirmBox('Tạo lại dữ liệu mẫu?','Toàn bộ dữ liệu hiện tại sẽ bị thay bằng dữ liệu mẫu.','Tạo lại',()=>{S=seed();cart.lines.clear();cart.cust=null;save();applyTheme();render();toast('Đã tạo lại dữ liệu mẫu')});break;
     case 'clear-all':confirmBox('Xoá toàn bộ đơn & khách?','Sản phẩm và cài đặt được giữ lại. Không thể hoàn tác.','Xoá hết',()=>{S.orders=[];S.customers=[];S.seq=1001;cart.cust=null;save();render();toast('Đã xoá dữ liệu')});break;
     case 'set-theme':S.settings.theme=v;save();applyTheme();render();break;
+    // gift cards
+    case 'gc-sell':openGiftSell();break;
+    case 'gc-redeem':openGiftLookup('redeem');break;
+    case 'gc-check':openGiftLookup('check');break;
+    case 'gc-open':openGiftCard(v);break;
+    case 'gc-copy':copyText(gcById(v).code,'Đã sao chép mã '+gcById(v).code);break;
+    case 'gc-copy-msg':copyText(gcMessage(gcById(v)),'Đã sao chép tin nhắn, dán vào Zalo/Messenger để gửi khách');break;
+    case 'gc-use':{const g=gcById(v);cart.redeem=g.id;closeOverlay(true);if(route()==='ban-hang')refreshPOS();else go('ban-hang');toast('Thẻ '+g.code+' sẽ được trừ khi thanh toán');break}
+    case 'gc-extend':{const g=gcById(v);g.expires=Math.max(g.expires,Date.now())+91*DAY;g.log.push({ts:Date.now(),type:'extend',amt:0});save();if(route()==='the-qua-tang')render();openGiftCard(g.id);toast('Đã gia hạn đến '+fDateY(g.expires));break}
+    case 'gc-void':{const g=gcById(v);confirmBox('Huỷ thẻ '+g.code+'?','Số dư '+money(g.balance)+' sẽ không dùng được nữa. Chỉ huỷ khi thẻ bị lộ mã hoặc đã hoàn tiền cho khách.','Huỷ thẻ',()=>{g.log.push({ts:Date.now(),type:'void',amt:g.balance});g.status='void';save();render();openGiftCard(g.id);toast('Đã huỷ thẻ')});break}
+    case 'g-filter':UI.gF=v;render();break;
     // bookings
     case 'b-day':UI.bDate=v==='0'?sod(Date.now()):sod(UI.bDate+(+v)*DAY+DAY/2);render();break;
     case 'slot':{const r=t.getBoundingClientRect();const m=TL.H0*60+Math.floor((e.clientY-r.top)/TL.PX*2)*30;openBookingForm(null,{staff:v,ts:UI.bDate+Math.min(m,(TL.H1*60-30))*6e4});break}
@@ -1397,13 +1576,14 @@ document.addEventListener('input',e=>{
   else if(t.id==='o-q'){UI.oQ=t.value;UI.oLimit=40;rerenderKeepFocus(t)}
   else if(t.id==='p-q'){UI.pQ=t.value;rerenderKeepFocus(t)}
   else if(t.id==='c-q'){UI.cQ=t.value;rerenderKeepFocus(t)}
+  else if(t.id==='g-q'){UI.gQ=t.value;rerenderKeepFocus(t)}
 });
 document.addEventListener('change',e=>{
   const t=e.target;
   if(t.id==='b-date'&&t.value){const [y,m,d]=t.value.split('-').map(Number);UI.bDate=new Date(y,m-1,d).getTime();render()}
   else if(t.id==='o-m'){UI.oMethod=t.value;UI.oLimit=40;render()}
   else if(t.id==='c-s'){UI.cSort=t.value;render()}
-  else if(t.dataset.set){const k=t.dataset.set;S.settings[k]=k==='tax'?Math.max(0,Math.min(100,+t.value||0)):t.value.trim();save();renderShell();toast('Đã lưu cài đặt')}
+  else if(t.dataset.set){const k=t.dataset.set;S.settings[k]=k==='tax'?Math.max(0,Math.min(100,+t.value||0)):k==='gcMonths'?Math.max(1,Math.min(60,+t.value||12)):t.value.trim();save();renderShell();toast('Đã lưu cài đặt')}
 });
 function rerenderKeepFocus(input){const id=input.id,pos=input.selectionStart;render();const n=document.getElementById(id);if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}}
 document.addEventListener('keydown',e=>{
