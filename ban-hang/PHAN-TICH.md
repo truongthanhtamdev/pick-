@@ -68,3 +68,25 @@ Bản demo lưu dữ liệu trong `localStorage` của trình duyệt. Mỗi má
 4. **Nhân viên & ca làm**: chấm công, doanh số theo nhân viên, giờ làm của từng người cho trang đặt lịch.
 5. **Biến thể món** (size, topping), combo, in bếp.
 6. **PWA offline**: bán hàng được cả khi mất mạng.
+
+## 5. Phiên bản cho tiệm nail ở Úc
+
+Bản demo hiện được cấu hình cho một tiệm nail ở Melbourne. Chủ tiệm và thợ dùng giao diện tiếng Việt; khách dùng tiếng Anh.
+
+| Nhu cầu | Cách app xử lý |
+|---|---|
+| Tiền tệ, thuế | AUD ($, có cent). Giá đã gồm GST 10%; hoá đơn tự tách tiền GST |
+| Hoá đơn hợp lệ | Có chữ **TAX INVOICE**, ABN, địa chỉ và tên thợ phục vụ, viết bằng tiếng Anh |
+| Thanh toán | Thẻ / EFTPOS (phổ biến nhất), Tiền mặt (gợi ý $5–$100, tự tính tiền thối), PayID |
+| Dịch vụ và hàng bán lẻ | Dịch vụ không tính tồn kho; sản phẩm bán lẻ (cuticle oil, hand cream…) có tồn kho |
+| Thợ | Mỗi đơn phải chọn thợ. Tip chọn khi thanh toán, không tính vào doanh thu |
+| Lương thợ | Báo cáo theo từng thợ: lượt khách, doanh thu dịch vụ, hoa hồng (%, đổi trong Cài đặt), tip, tổng thợ nhận |
+| Đặt lịch online | Trang tiếng Anh: chọn dịch vụ, thợ (hoặc "Any technician"), ngày, giờ |
+| Thẻ quà tặng | Mệnh giá $50–$200, in tiếng Anh. **Luật Úc bắt buộc hạn dùng tối thiểu 3 năm**, app không cho đặt thấp hơn |
+
+### Cần bổ sung khi dùng thật
+- Đồng bộ nhiều máy (Firebase) để quầy, iPad của thợ và trang đặt lịch online dùng chung dữ liệu.
+- Gửi SMS xác nhận và nhắc lịch trước 24 giờ (ví dụ qua Twilio hoặc ClickSend), giảm khách đặt rồi không đến.
+- Đặt cọc khi đặt online cho dịch vụ dài (acrylic, Gel-X).
+- Phụ phí thẻ (card surcharge) nếu tiệm muốn tính, phải ghi rõ cho khách trước khi thanh toán.
+- Bán thẻ quà tặng online qua cổng thanh toán (Stripe).
